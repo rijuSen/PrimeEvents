@@ -1,16 +1,19 @@
 #class for booking in prime events
 
 class Booking:
+    #to keep track of number of objects
+    numOfUsers = 0
+    #booking id to be generated
+    bookingId = 0
+    #payment id to be selected from payment
+    paymentId = 0
 
     def __init__(self, hallId, userId, bookingDate, cateringChosen):
-        #booking id to be generated
-        #self.bookingId = 1
-        #payment id to be selected from payment
-        #self.paymentId = 1
         self.hallId = hallId
         self.userId = userId
         self.bookingDate = bookingDate
         self.cateringChosen = cateringChosen
+        Booking.numOfUsers += 1
 
     def getHallId(self):
         return self.hallId
@@ -38,6 +41,9 @@ class Booking:
         pass
 
     def getBookingId():
+        return self.bookingId
+    
+    def generateBookingId():
         #get booking id from database
         pass
 
@@ -47,6 +53,9 @@ class Booking:
     def selectPaymentMethod():
         #select from payment method in Payments
         pass
+
+    def getNumOfUserObjectsCreated():
+        return Booking.numOfUsers
 
 
 

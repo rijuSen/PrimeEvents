@@ -1,10 +1,11 @@
 from displayPage import displayPage
-
+from user.user import *
 def main():
+
 #    adminPage = {'0':'Logout','1':'Manager Users/Owners','2':'Hall Listing','3':'Manage Discounts'}
- #   displayPage('AdminHomePage',adminPage)
-    ownerPage = {'0':'Logout','1':'Manager Halls','2':'Manage Bookings','3':'View Quotation Request','4':'Manage Payments','5':'Manage Discounts'}
-    displayPage('OwnerHomePage',ownerPage)
+#   displayPage('AdminHomePage',adminPage)
+#   ownerPage = {'0':'Logout','1':'Manager Halls','2':'Manage Bookings','3':'View Quotation Request','4':'Manage Payments','5':'Manage Discounts'}
+#    displayPage('OwnerHomePage',ownerPage)
 #    manageHallPage = {'0':'Go Back','1':'View Halls','2':'Create Hall'}
 #    displayPage('ManageHallPage',manageHallPage)
 #    createHallPage = {'0':'Go Back','1':'Enter Hall Name: ','2':'Enter Hall Capacity: ','3':'Enter Hall Size: ','4':'Enter Hall Location: '}
