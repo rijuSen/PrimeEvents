@@ -5,24 +5,32 @@ from pathlib import Path
 class User:
     '''docstring'''
     
+    #class variable to define the path to the DB file
+    dbFileName = "databaseFiles/primeEventsDb.db"
     def insertIntoUserDb(self,firstName,lastName,email,password,userType,allowFlag):
         try:
-            conn = sqlite3.connect(self.userDbFileName)
+            conn = sqlite3.connect(User.dbFileName)
             c = conn.cursor()
             with conn:
                 c.execute("INSERT INTO users VALUES (:firstName, :lastName, :email, :password, :userType, :allowFlag)",
                         {'firstName': firstName, 'lastName': lastName, 'email': email, 'password': password, 'userType': userType, 'allowFlag': allowFlag})
-        except sqlite3.IntegrityError as sqlite3Error:
+            c.execute("SELECT rowid from users WHERE email = :email",{'email': email,})
+            
+            #save the rowid of the inserted row in the variable rowId
+            for id in c.fetchone():
+                self.rowId = id
+        
+        except sqlite3.Error as sqlite3Error:
             print("SQLite3 Error : -->",sqlite3Error)
         finally:
             conn.close()
+        
 
     def __init__(self,firstName,lastName,email,password,userType):
-        self.userDbFileName = "../databaseFiles/primeEventsDb.db"
-        self.userDbFilePath = Path(self.userDbFileName)
+        self.userDbFilePath = Path(User.dbFileName)
         #check if database file already exists
         if not self.userDbFilePath.is_file():
-            conn = sqlite3.connect(self.userDbFileName)
+            conn = sqlite3.connect(User.dbFileName)
             c = conn.cursor()
             c.execute("""CREATE TABLE users (
                         firstName text NOT NULL,
@@ -49,22 +57,42 @@ class User:
         return self.lastName
 
     def fullName(self):
-        return '{} {}'.format(self.firstName, sefl.lastName)
+        return '{} {}'.format(self.firstName, self.lastName)
 
     def getEmail():
         return self.email
 
-    def getPasswordHash():
-        pass
-
-    def createUser():
-        pass
-
     def deleteUser():
         pass
 
-    def editUser():
-        pass
+    @classmethod
+    def changeDatabase(cls, newDbName):
+        cls.dbFileName = newDbName
+
+    @classmethod
+    def editUser(cls,editEntryWithEmail,firstName,lastName,password):
+        """Only first name, last name and password can be modified"""
+        conn = sqlite3.connect(self.dbFileName)
+        c = conn.cursor()
+        try:
+            with conn:
+                c.execute("""UPDATE users SET firstName = :fname, lastName = :lname, password = :pass WHERE email = :email""",{'fname': firstName, 'lname': lastName, 'password': password, 'email': editEntryWithEmail})
+        except sqlite3.Error as sqlite3Error:
+            print("SQLite3 Error -->",sqlite3Error)
+        finally:
+            conn.close()
+
+#    @classmethod
+#    def displayEntry(cls,email):
+#        conn = sqlite3.connect(cls.dbFileName)
+#        c = conn.cursor()
+#        c.execute("SELECT firstName, lastName, email,  from users WHERE email = :email",{'email': email,})
+#        for column in c.fetchone():
+
+
+
+
+
 
 
 
@@ -109,7 +137,7 @@ class Admin(User):
         super().__init__(firstName,lastName,email,password,self.userType)
 
     def viewAllUsers():
-        conn = sqlite3.connect('../databaseFiles/primeEventsDb.db')
+        conn = sqlite3.connect(User.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid,* FROM users")
         output = c.fetchall()
@@ -118,7 +146,7 @@ class Admin(User):
         conn.close()
 
     def blockUser(rowid):
-        conn = sqlite3.connect('../databaseFiles/primeEventsDb.db')
+        conn = sqlite3.connect(User.dbFileName)
         c = conn.cursor()
         try:
             with conn:
@@ -135,7 +163,6 @@ class Admin(User):
             print("SQLite3 Error -->",sqlite3Error)
         finally:
             conn.close()
-
 
     def viewAllBookings():
         pass
