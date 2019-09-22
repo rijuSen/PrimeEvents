@@ -1,9 +1,82 @@
-from displayPage import displayPage
+from controller import *
 from user.user import *
-def main():
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+import time
+def acceptUserDetails():
+    fName = input('Enter First Name: ')
+    lName = input('Enter Last Name: ')
+    mailFlag = True 
+    while mailFlag:
+        email = input('Enter Email Id: ')
+        mailFlag = Owner.emailExists(email)
+        if mailFlag == True:
+            print("Mail id already used, try another mail id")
+            time.sleep(2)
 
-#    adminPage = {'0':'Logout','1':'Manager Users/Owners','2':'Hall Listing','3':'Manage Discounts'}
-#   displayPage('AdminHomePage',adminPage)
+    #check password length more than or equal to 8
+    passFlag = True
+    while passFlag:
+        passPlain = input('Enter Password(must be >= 8): ')
+        if len(passPlain) >= 8:
+            passFlag = False
+            print("Password must have 8 or more characters")
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(bytes(passPlain, 'utf-8'))
+    passHash = digest.finalize()
+    print(passHash)
+    return fName,lName,email,passHash 
+
+
+def main():
+    adminPage = {'0':'Logout','1':'Manager Users/Owners','2':'Hall Listing','3':'Manage Discounts'}
+    landingPage = {'L': 'Login', 'O': 'Register as Owner', 'C': 'Register as Customer'}
+    registerPage = {'F':'First Name', 'L': 'Last Name', 'E': 'Email', 'P': 'Password'}
+    navPageDict = {'O': 'Logout', 'B': 'Go Back'}
+    state = 1
+    if state == 1:
+        navPlaceHolder = dict()
+        selection = displayPage('Home Page', landingPage, navPlaceHolder)
+        if selection == 'O':
+            fName,lName,email,passHash = acceptUserDetails()
+            owner = Owner(fName,lName,email,passHash)
+            print(owner.getRowId())
+        elif selection == 'C':
+            fName,lName,email,passHash = acceptUserDetails()
+            customer = Customer(fName,lName,email,passHash)
+            print(customer.getRowId())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #   ownerPage = {'0':'Logout','1':'Manager Halls','2':'Manage Bookings','3':'View Quotation Request','4':'Manage Payments','5':'Manage Discounts'}
 #    displayPage('OwnerHomePage',ownerPage)
 #    manageHallPage = {'0':'Go Back','1':'View Halls','2':'Create Hall'}

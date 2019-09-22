@@ -62,6 +62,9 @@ class User:
     def getEmail():
         return self.email
 
+    def getRowId(self):
+        return self.rowId
+
     def deleteUser():
         pass
 
@@ -81,7 +84,18 @@ class User:
             print("SQLite3 Error -->",sqlite3Error)
         finally:
             conn.close()
+    
 
+    @classmethod
+    def emailExists(cls,email):
+        conn = sqlite3.connect(cls.dbFileName)
+        c = conn.cursor()
+        c.execute("SELECT count(*) FROM users WHERE email = :email",{'email':email,})
+        data=c.fetchone()[0]
+        if data==0:
+            return False
+        else:
+            return True
 #    @classmethod
 #    def displayEntry(cls,email):
 #        conn = sqlite3.connect(cls.dbFileName)
@@ -139,7 +153,7 @@ class Admin(User):
     def viewAllUsers():
         conn = sqlite3.connect(User.dbFileName)
         c = conn.cursor()
-        c.execute("SELECT rowid,* FROM users")
+        c.execute("SELECT rowid,firstName, lastName, email, userType, allowFlag FROM users")
         output = c.fetchall()
         for entry in output:
             print(entry,end='\n')
