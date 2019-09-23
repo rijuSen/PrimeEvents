@@ -59,11 +59,14 @@ class User:
     def fullName(self):
         return '{} {}'.format(self.firstName, self.lastName)
 
-    def getEmail():
+    def getEmail(self):
         return self.email
 
     def getRowId(self):
         return self.rowId
+
+    def getUserType(self):
+        return self.userType
 
     def deleteUser():
         pass
@@ -103,6 +106,26 @@ class User:
 #        c.execute("SELECT firstName, lastName, email,  from users WHERE email = :email",{'email': email,})
 #        for column in c.fetchone():
 
+    #take a mail id and password and return a user object
+    @classmethod
+    def checkPassword(cls,email,passHash):
+        conn = sqlite3.connect(cls.dbFileName)
+        c = conn.cursor()
+        c.execute("SELECT rowid, firstName, lastName, email, password, userType, allowFlag FROM users WHERE email = :email AND password = :password",{'email': email, 'password': passHash})
+        data = c.fetchone()
+        print(data)
+        if not data == None:
+            cls.rowId = data[0]
+            cls.firstName = data[1]
+            cls.lastName = data[2]
+            cls.email = data[3]
+            cls.password = data[4]
+            cls.userType = data[5]
+            cls.allowFlag = data[6]
+            return True, cls.rowId, cls.firstName, cls.userType, cls.allowFlag 
+        else:
+            return False, '', '', '', ''
+            
 
 
 
