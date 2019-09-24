@@ -1,6 +1,13 @@
 from controller import *
 from user.user import *
 
+def navOptions(selection, state):
+    if selection == 'O':
+        state = 1
+    elif selection == 'B':
+        state = state - 1 
+    return state
+
 
 def main():
     adminPage = {'1':'Manager Users/Owners','2':'Hall Listing','3':'Manage Discounts'}
@@ -45,18 +52,15 @@ def main():
 
         while state == 2 and userType == 'Customer':
             selection = displayPage('Customer Page', firstName, customerPage, navPageDict)
-            print(selection)
-            state = 3
-        
+            state = navOptions(selection, state)
+
         while state == 2 and userType == 'Owner':
             selection = displayPage('Owner Page', firstName, ownerPage, navPageDict)
-            print(selection)
-            state = 3
-        
+            state = navOptions(selection, state)
+
         while state == 2 and userType == 'Admin':
             selection = displayPage('Admin Page', firstName, adminPage, navPageDict)
-            print(selection)
-            state = 3
+            state = navOptions(selection, state)
 
 
 
