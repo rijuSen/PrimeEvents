@@ -8,6 +8,24 @@ class User:
     #class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
     def insertIntoUserDb(self,firstName,lastName,email,password,userType,allowFlag):
+        ''' Function needs arguments --> firstName,lastName,email,password,userType,allowFlag'''
+        self.userDbFilePath = Path(User.dbFileName)
+        #check if database file already exists
+        if not self.userDbFilePath.is_file():
+            conn = sqlite3.connect(User.dbFileName)
+            c = conn.cursor()
+            c.execute("""CREATE TABLE users (
+                        firstName text NOT NULL,
+                        lastName text NOT NULL, 
+                        email text NOT NULL UNIQUE,
+                        password text NOT NULL,
+                        userType text NOT NULL,
+                        allowFlag int DEFAULT 0,
+                        UNIQUE(email))
+                        """)
+            conn.close()
+        
+        #insert entry into database
         try:
             conn = sqlite3.connect(User.dbFileName)
             c = conn.cursor()
@@ -27,21 +45,6 @@ class User:
         
 
     def __init__(self,firstName,lastName,email,password,userType):
-        self.userDbFilePath = Path(User.dbFileName)
-        #check if database file already exists
-        if not self.userDbFilePath.is_file():
-            conn = sqlite3.connect(User.dbFileName)
-            c = conn.cursor()
-            c.execute("""CREATE TABLE users (
-                        firstName text NOT NULL,
-                        lastName text NOT NULL, 
-                        email text NOT NULL UNIQUE,
-                        password text NOT NULL,
-                        userType text NOT NULL,
-                        allowFlag int DEFAULT 0,
-                        UNIQUE(email))
-                        """)
-            conn.close()
         self.firstName = firstName
         self.lastName = lastName
         self.email = email

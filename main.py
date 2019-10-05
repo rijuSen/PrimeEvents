@@ -1,6 +1,7 @@
 from controller import *
 from user.user import *
-
+from hall.hall import *
+from controller import Session
 def navOptions(selection, state):
     if selection == 'O':
         state = 1
@@ -11,7 +12,6 @@ def navOptions(selection, state):
 
 def main():
     adminPage = {'1':'Manager Users/Owners','2':'Hall Listing','3':'Manage Discounts'}
-    landingPage = {'L': 'Login', 'O': 'Register as Owner', 'C': 'Register as Customer'}
     registerPage = {'F':'First Name', 'L': 'Last Name', 'E': 'Email', 'P': 'Password'}
     customerPage = {'1':'Search Halls','2':'Manager Bookings'}
     ownerPage = {'1':'Manager Halls','2':'Manage Bookings','3':'View Quotation Request','4':'Manage Payments','5':'Manage Discounts'}
@@ -21,38 +21,63 @@ def main():
     print(onFlag)
     while onFlag:
         while state == 1: 
-            navPlaceHolder = dict()
+            os.system('clear')
+            landingPage = {'L': 'Login', 'O': 'Register as Owner', 'C': 'Register as Customer'}
+            navPageDict = {'E' : 'Exit'}
             userNamePlaceHolder = ''
-            selection = displayPage('Login Page', userNamePlaceHolder, landingPage, navPlaceHolder)
-            if selection == 'O':
-                fName,lName,email,passHash = acceptUserDetails()
-                userObj = Owner(fName,lName,email,passHash)
-                userId = userObj.getRowId()
-                userType = userObj.getUserType()
-                firstName = userObj.getFirstName()
-                state = 2
-                #print(owner.getRowId())
-            elif selection == 'C':
-                fName,lName,email,passHash = acceptUserDetails()
-                userObj = Customer(fName,lName,email,passHash)
-                userId = userObj.getRowId()
-                userType = userObj.getUserType()
-                firstName = userObj.getFirstName()
-                state = 2
-                #print(customer.getRowId())
-            elif selection == 'L':
-                userId, firstName, userType, allowFlag = userLogin()
-                if allowFlag == 0:
+            displayPage('Login Page', userNamePlaceHolder, landingPage, navPageDict)
+            invalidSelectionFlag, selection = selectOption(landingPage, navPageDict)
+            if not invalidSelectionFlag:
+                if selection == 'O':
+                    fName,lName,email,passHash = acceptUserDetails()
+                    #create a user object
+                    userObj = Owner(fName,lName,email,passHash)
+                    #initiate a session using user object 
+                    sessionObj = Session(userObj.getRowId(), userObj.getUserType())
+                    print(sessionObj.getSessionId())
                     state = 2
-                else:
-                    print('User blocked')
-                    time.sleep(2)
+                    #print(owner.getRowId())
+                elif selection == 'C':
+                    fName,lName,email,passHash = acceptUserDetails()
+                    userObj = Customer(fName,lName,email,passHash)
+                    userId = userObj.getRowId()
+                    userType = userObj.getUserType()
+                    firstName = userObj.getFirstName()
+                    print(userId)
+                    state = 2
+                    #print(customer.getRowId())
+                elif selection == 'L':
+                    userId, firstName, userType, allowFlag = userLogin()
+                    if allowFlag == 0:
+                        state = 2
+                    else:
+                        print('User blocked')
+                        time.sleep(2)
+                        state = 1
+                elif selection == 'E':
+                    exit()
             else:
                 print('Invalid selection, Please input again')
 
+        print('UserType',userType)
+        time.sleep(2)
         while state == 2 and userType == 'Customer':
+            displayPage('Customer Page', firstName, customerPage, navPageDict)
+            invalidSelectionFlag, selection = selectOption(landingPage, navPageDict)
             selection = displayPage('Customer Page', firstName, customerPage, navPageDict)
             state = navOptions(selection, state)
+            #print(selection,state)
+            #time.sleep(4)
+            if selection == '1':
+                allEntries = Hall.viewAllHalls()
+                print(allEntries)
+                time.sleep(4)
+                selection = displayPage('Customer Page', firstName, customerPage, navPageDict)
+                state = navOptions(selection, state)
+
+#                for startIndex in range(0,len(allEntries),4):
+ #                   displayTableFormat(allEntries,startIndex)
+                    
 
         while state == 2 and userType == 'Owner':
             selection = displayPage('Owner Page', firstName, ownerPage, navPageDict)

@@ -42,6 +42,7 @@ class Hall:
             #check if table halls exists in the database
             c.execute('select name from sqlite_master where type = "table"')
             temp = c.fetchall()
+            tablePresentFlag = False
             for tup in temp:
                 for val in tup:
                     if 'halls' in val:
@@ -84,12 +85,14 @@ class Hall:
     def getHallCapacity():
         return hallCapacity
 
-    def viewAllHalls():
+
+    @classmethod
+    def viewAllHalls(cls):
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid,* FROM halls")
         output = c.fetchall()
-        for entry in output:
-            print(entry,end='\n')
+        #print(output)
+        #print(type(output))
         conn.close()
-
+        return output

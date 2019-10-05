@@ -5,40 +5,37 @@ import time
 import getpass
 import os
 
-import time
-
 #controller class
 def displayPage(pageName, userName, pageMenuDict, pageNavDict):
-    invalidSelectionFlag = True
-    while invalidSelectionFlag:
-        os.system('clear') 
-        #Display Page Name
-        print('='*40)
-        print('{0:^40}'.format(pageName))
-        print('='*40)
-        #Display User Name
-        if not len(userName) == 0:
-            print('{0:>40}'.format('Logged in as '+userName))
-            print('='*40)
+    os.system('clear') 
+    #Display Page Name
+    print('-'*40)
+    print('{0:^40}'.format(pageName))
+    print('-'*40)
+    #Display User Name
+    if not len(userName) == 0:
+        print('{0:>40}'.format('Logged in as '+userName))
+        print('-'*40)
+    if not len(pageMenuDict) == 0:
         #Menu Options format
         print('Input key to select corresponding option')
-        print('='*40)
+        print('-'*40)
         print('{0:^10}{1:^30}'.format('[Keys]','Options'))
-        print('='*40)
+        print('-'*40)
         #display menu
         for key, option in pageMenuDict.items():
             print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
-        print('='*40)
-        #navigation panel
-        print('='*40)
-        if not len(pageNavDict) == 0:
-            for key, option in pageNavDict.items():
-                print('{0}{1}{2}{3:>2}'.format('[',key,']',option), end = '')
-            print()
-        print('='*40)
-        #selection variable can be used further when rest of the system would be developed
-        invalidSelectionFlag, selection = selectOption(pageMenuDict,pageNavDict)
-    return selection
+        print('-'*40)
+            #navigation panel
+        print('-'*40)
+    if not len(pageNavDict) == 0:
+        navBar = ''
+        for key, option in pageNavDict.items():
+            navBarTemp = '{:^10}'.format('['+key+']'+option)
+            navBar = navBar + navBarTemp
+        print('{:^41}'.format(navBar))
+    print('-'*40)
+
 
 
 def selectOption(pageMenuDict,pageNavDict):
@@ -105,4 +102,22 @@ def userLogin():
             os.system('clear')
     return rowId, firstName, userType, allowFlag
 
+
+def displayTableFormat(output,startIndex):
+    print("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format('ID','Hall-Name','Hall-Type','Hall-Addr','Hall-Capacity'))
+    for row in output[startIndex:startIndex + 4:1]:
+        print("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format(row[0],row[1],row[3],row[4],row[5]))
+
+
+class Session:
+    '''class to maintain a session'''
+    def _init_(self, rowId, userType):
+        self.sessionId = rowId
+        self.userType = userType
+
+    def getSessionId(self):
+        return self.rowId
+
+    def getUserType(self):
+        return self.userType
 
