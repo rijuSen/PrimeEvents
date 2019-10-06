@@ -43,15 +43,45 @@ class User:
         finally:
             conn.close()
         
+    def checkPassword(self,userInfo):
+        email = userInfo['email']
+        password = userInfo['password']
+        conn = sqlite3.connect(self.dbFileName)
+        c = conn.cursor()
+        c.execute("SELECT rowid, firstName, lastName, email, password, userType, allowFlag FROM users WHERE email = :email AND password = :password",{'email': email, 'password': password})
+        row = c.fetchone()
+        return row
+         
+    #def __init__(self,firstName,lastName,email,password,userType):
+    
+    def __init__(self,userInfo):
+        #create a new entry in the DB
+        if len(userInfo) == 5:
+            self.firstName = userInfo['firstName']
+            self.lastName = userInfo['lastName']
+            self.email = userInfo['email']
+            self.password = userInfo['password']
+            self.userType = userInfo['userType']
+            self.allowFlag = 0
+            self.insertIntoUserDb(self.firstName,self.lastName,self.email,self.password,self.userType,self.allowFlag)
+            self.success = True
+        #create an object of an existing entry
+        if len(userInfo) == 2:
+            row = self.checkPassword(userInfo)
+            if not row == None:
+                self.rowId = row[0]
+                self.firstName = row[1]
+                self.lastName = row[2]
+                self.email = row[3]
+                self.password = row[4]
+                self.userType = row[5]
+                self.allowFlag = row[6]
+                self.success = True
+            else:
+                self.success = False
 
-    def __init__(self,firstName,lastName,email,password,userType):
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
-        self.password = password
-        self.userType = userType
-        self.allowFlag = 0
-        self.insertIntoUserDb(firstName,lastName,email,password,userType,self.allowFlag)
+    def getSuccess(self):
+        return self.success
 
     def getFirstName(self):
         return self.firstName
@@ -70,6 +100,9 @@ class User:
 
     def getUserType(self):
         return self.userType
+
+    def getAllowFlag(self):
+        return self.allowFlag
 
     def deleteUser():
         pass
@@ -110,25 +143,7 @@ class User:
 #        for column in c.fetchone():
 
     #take a mail id and password and return a user object
-    @classmethod
-    def checkPassword(cls,email,passHash):
-        conn = sqlite3.connect(cls.dbFileName)
-        c = conn.cursor()
-        c.execute("SELECT rowid, firstName, lastName, email, password, userType, allowFlag FROM users WHERE email = :email AND password = :password",{'email': email, 'password': passHash})
-        data = c.fetchone()
-        print(data)
-        if not data == None:
-            cls.rowId = data[0]
-            cls.firstName = data[1]
-            cls.lastName = data[2]
-            cls.email = data[3]
-            cls.password = data[4]
-            cls.userType = data[5]
-            cls.allowFlag = data[6]
-            return True, cls.rowId, cls.firstName, cls.userType, cls.allowFlag 
-        else:
-            return False, '', '', '', ''
-            
+           
 
 
 
@@ -139,9 +154,9 @@ class User:
 class Owner(User):
     '''Owner class extending User'''
 
-    def __init__(self,firstName,lastName,email,password):
-        self.userType = "Owner"            
-        super().__init__(firstName,lastName,email,password,self.userType)
+    def __init__(self,userInfo):
+        userInfo['userType'] = "Owner"            
+        super().__init__(userInfo)
 
     
     def getOwnerHalls(userId):
@@ -157,9 +172,9 @@ class Owner(User):
 class Customer(User):
     '''Customer class extending User'''
 
-    def __init__(self,firstName,lastName,email,password):
-       self.userType = "Customer"
-       super().__init__(firstName,lastName,email,password,self.userType)
+    def __init__(self,userInfo):
+        userInfo['userType'] = "Customer"            
+        super().__init__(userInfo)
 
     def getCustomerBookingHistory(userId):
         pass
