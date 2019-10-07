@@ -12,43 +12,62 @@ def navOptions(selection, state):
         state = 1
     elif selection == 'B':
         state = state - 1 
+    elif selection == 'E':
+        state = 0
     return state
 
-def displayPage(pageName, userName, pageMenuDict, pageNavDict):
+def displayPage(pageName, userName, optionDisplay, pageNavDict):
     os.system('clear')
     #Display Page Name
-    print('-'*40)
-    print('{0:^40}'.format(pageName))
-    print('-'*40)
+    print('-'*45)
+    print('{0:^45}'.format(pageName))
+    print('-'*45)
     #Display User Name
     if not len(userName) == 0:
-        print('{0:>40}'.format('Logged in as '+userName))
-        print('-'*40)
-    if not len(pageMenuDict) == 0:
-        #Menu Options format
-        print('Input key to select corresponding option')
-        print('-'*40)
-        print('{0:^10}{1:^30}'.format('[Keys]','Options'))
-        print('-'*40)
-        #display menu
-        for key, option in pageMenuDict.items():
-            print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
-        print('-'*40)
+        print('{0:^45}'.format('Logged in as '+userName.capitalize()))
+        print('-'*45)
+    if not len(optionDisplay) == 0:
+        if isinstance(optionDisplay,dict):
+            #Menu Options format
+            print('{:^45}'.format('Input key to select corresponding option'))
+            print('-'*45)
+            print('{0:^10}{1:^30}'.format('[Keys]','Options'))
+            print('-'*45)
+            #display menu
+            for key, option in optionDisplay.items():
+                print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
+            print('-'*45)
             #navigation panel
-        print('-'*40)
+            print('-'*45)
+        if isinstance(optionDisplay,list):
+            #Menu Options format
+            print('Input key to select corresponding option')
+            print('-'*45)
+            #display menu
+            tableHeader = ("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format('Key','Venue','Type','Addr','Capacity'))
+            print("{0:^45}".format(tableHeader))
+            for row in optionDisplay:
+                rowWise = ("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format(row[0],row[1],row[3],row[4],row[5]))
+                print('{:^45}'.format(rowWise))
+            print('-'*45)
+            #navigation panel
+            print('-'*45)
     if not len(pageNavDict) == 0:
         navBar = ''
         for key, option in pageNavDict.items():
-            navBarTemp = '{:^10}'.format('['+key+']'+option)
+            navBarTemp = '{:^11}'.format('['+key+']'+option)
             navBar = navBar + navBarTemp
-        print('{:^41}'.format(navBar))
-    print('-'*40)
+        print('{:^45}'.format(navBar))
+    print('-'*45)
 
-def selectOption(pageMenuDict,pageNavDict):
+def selectOption(optionDisplay,pageNavDict):
     #prompt user to select option
     selection = input('Enter your selection: ')
-    if selection in pageMenuDict.keys():
-        print('Your selection: {}'.format(pageMenuDict.get(selection)))
+    if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
+        print('Your selection: {}'.format(optionDisplay.get(selection)))
+        return False, selection
+    elif isinstance(optionDisplay, list) and selection.isdigit() and int(selection) <= len(optionDisplay):
+        print('Your selection: {}'.format(optionDisplay[int(selection)-1]))
         return False, selection
     elif selection in pageNavDict.keys():
         print('Your selection: {}'.format(pageNavDict.get(selection)))
@@ -120,6 +139,12 @@ def userLogin():
     return {'success':success,'userObj':userObj}
 
 
+def displayTableFormat(listData, startIndex):
+    print("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format('ID','Hall-Name','Hall-Type','Hall-Addr','Hall-Capacity'))
+    for row in listData[startIndex:startIndex + 4:1]:
+        print("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format(row[0],row[1],row[3],row[4],row[5]))
+
+
 def main():
     adminPage = {'1':'Manager Users/Owners','2':'Hall Listing','3':'Manage Discounts'}
     registerPage = {'F':'First Name', 'L': 'Last Name', 'E': 'Email', 'P': 'Password'}
@@ -127,7 +152,7 @@ def main():
     state = 1
     onFlag = True
     print(onFlag)
-    while onFlag:
+    while state > 0:
         #state 1 represent login action
         while state == 1: 
             os.system('clear')
@@ -179,27 +204,87 @@ def main():
             else:
                 print('Invalid selection, Please input again')
         print('State is {} and session ID is {} and user type is {}'.format(state,sessionObj.getSessionId(),sessionObj.getUserType()))
-
-#        print('UserType',userType)
- #       time.sleep(2)
+        
         #state 2 represent actions post login
         while state == 2 and sessionObj.getUserType() == 'Customer':
             customerPage = {'1':'Search Halls','2':'Manager Bookings'}
-            navPageDict = {'O': 'Logout', 'B': 'Go Back', 'E': 'Exit'}
+            navPageDict = {'O': 'Logout', 'E': 'Exit'}
             displayPage('Customer Page', sessionObj.getFirstName(), customerPage, navPageDict)
             invalidSelectionFlag, selection = selectOption(customerPage, navPageDict)
+            #for navigation menu
             if not invalidSelectionFlag:
-            #print(selection,state)
-            #time.sleep(4)
-                if selection == '1':
-                    allEntries = Hall.viewAllHalls()
-                    print(allEntries)
-                    time.sleep(4)
-                elif selection == 'E':
-                                    exit()
+                if selection in navPageDict:
+                    state = navOptions(selection, state)
+                else:
+                    #take to next state to display hall listing
+                    state = 3
             else:
                 print('Invalid selection, Please input again')
-            print('State is {} and session ID is {} and user type is {}'.format(state,sessionObj.getSessionId(),sessionObj.getUserType()))
+        
+        #state 3 is for hall listing for any user
+        while state == 3 and selection == '1':
+#            navPageDict = {'B': 'Go Back', 'N': 'Next Page', 'O': 'Logout', 'E': 'Exit'}
+            navPageDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+            allEntries = Hall.viewAllHalls()
+            index = 0
+            displayPage('Hall Listing', sessionObj.getFirstName(), allEntries, navPageDict)
+            invalidSelectionFlag, selection = selectOption(allEntries, navPageDict)
+            if not invalidSelectionFlag:
+                if selection in navPageDict:
+                    state = navOptions(selection, state)
+                if selection.isdigit():
+                    if int(selection) < len(allEntries) + 1:
+                        print(allEntries[int(selection) + 1])
+                        exit()
+
+
+#            while index + 4 < len(allEntries):
+#                displayPage('Hall Listing', sessionObj.getFirstName(), allEntries[index: index + 4] navPageDict)
+#                invalidSelectionFlag, selection = selectOption(customerPage, navPageDict)
+#                if not invalidSelectionFlag:
+#                    if selection == 'B' and index == 0:
+#                        state = navOptions(selection,state)
+#                    elif selection == 'B' and index > 0:
+#                        index = index - 4
+#                        displayPage('Hall Listing', sessionObj.getFirstName(), allEntries[index:index + 4] navPageDict)
+#                    elif selection == 'N'  and index + 4 < len(allEntries):
+#                        displayPage('Hall Listing', sessionObj.getFirstName(), allEntries[index:index + 4] navPageDict)
+#                        index = index + 4
+#                    elif selection == 'N' and index + 4 > len(allEntries):
+#                        displayPage('Hall Listing', sessionObj.getFirstName(), allEntries[index:] navPageDict)
+#                    if selection in navPageDict:
+#                        state = navOptions(selection, state)
+#if selecti print('Yo')
+            #exit()
+        
+        
+#        while state == 3 and selection == '2':
+#            pass
+#
+#
+#
+#                if selection == '1':
+#                    navPageDict = {'B': 'Go Back', 'N': 'Next Page', 'O': 'Logout', 'E': 'Exit'}
+#                    allEntries = Hall.viewAllHalls()
+#                    index = 0
+#                    displayTableFormat(allEntries, index)
+#                    invalidSelectionFlag, selection = selectOption(customerPage, navPageDict)
+#                    while not invalidSelectionFlag:
+#                        if selection == 'B':
+#                            break
+#                        if selection == 'P':
+#                            if index != 0:
+#                                index = index - 4
+#                                displayTableFormat(allEntries, index)
+#                            else:
+#                                pass
+#
+#
+#                elif selection == 'E':
+#                                    exit()
+#            else:
+#                print('Invalid selection, Please input again')
+#            print('State is {} and session ID is {} and user type is {}'.format(state,sessionObj.getSessionId(),sessionObj.getUserType()))
 
                     #                for startIndex in range(0,len(allEntries),4):
                      #                   displayTableFormat(allEntries,startIndex)
