@@ -1,5 +1,6 @@
 import os
 import time
+from hall.hall import Hall
 
 def displayPage(pageName, userName, optionDisplay, pageNavDict):
     os.system('clear')
@@ -73,12 +74,36 @@ def navOptions(selection, state):
         state = 0
     return state
 
+def acceptHallDetails(userObj):
+    os.system('clear')
+    print('=' * 41)
+    print('{:^41}'.format('New Hall Page'))
+    print('=' * 41)
+    hallInfo = dict()
+    hallExistFlag = True
+    retryCount = 0
+    while hallExistFlag and retryCount < 3:
+        hallInfo['hallName'] = input('Enter Hall Name: ')
+        hallExistFlag = Hall.hallExists(hallInfo['hallName'], userObj)
+        retryCount = retryCount + 1
+        if hallExistFlag == True and retryCount < 3:
+            print("Hall already exists, try another Hall name")
+        elif hallExistFlag == True and retryCount == 3:
+            print('Maximum attemps reached, taking back to Manage Halls page')
+            time.sleep(2)
+        else:
+            hallInfo['hallType'] = input('Enter Hall Type: ')
+            hallInfo['hallAddr'] = input('Enter Hall Addr: ')
+            hallInfo['hallCapacity'] = input('Enter Hall Capacity: ')
+            hallInfo['ownerId'] = userObj.getRowId()
+    return hallExistFlag, hallInfo
+
 
 def ownerController(userObj):
     """ This method contains all functionalities related to owner"""
     state = 2
     ownerPage = {'1': 'Manage Halls', '2': 'Manage Bookings', '3': 'View Quotation Request', '4': 'Manage Payments'}
-    navPageDict = {'O': 'Logout', 'E': 'Exit'}
+    navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
     displayPage('Owner Page', userObj.getFirstName(), ownerPage, navPageDict)
     invalidSelectionFlag, selection = selectOption(ownerPage, navPageDict)
     # for navigation menu
@@ -90,5 +115,29 @@ def ownerController(userObj):
             state = 3
     else:
         print('Invalid selection, Please input again')
+
+    while state == 3 and selection == '1':
+        hallslist = Hall.viewUserHalls(userObj)
+        navPageDict = {'O': 'Logout', 'E': 'Exit', 'A': 'Add New Hall'}
+        displayPage('Owner Page', userObj.getFirstName(), hallslist, navPageDict)
+        invalidSelectionFlag, selection = selectOption(hallslist, navPageDict)
+        # for navigation menu
+        if not invalidSelectionFlag:
+            if selection == 'A':
+                hallExistFlag, hallInfo = acceptHallDetails(userObj)
+                # create a user object
+                if hallExistFlag:
+                    state = 3
+                else:
+                    hallObj = Hall(hallInfo)
+                    state = 4
+
+            if selection in navPageDict:
+                state = navOptions(selection, state)
+            else:
+                # take to next state to display hall listing
+                state = 4
+        else:
+            print('Invalid selection, Please input again')
 
     return state

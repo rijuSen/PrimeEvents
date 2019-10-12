@@ -212,7 +212,7 @@ def main():
         while state == 2 and userObj.getUserType() == 'Customer':
             customerController(userObj)
         while state == 2 and userObj.getUserType() == 'Owner':
-            ownerController(userObj)
+            state = ownerController(userObj)
 
     #    displayPage('OwnerHomePage',ownerPage)
     #    manageHallPage = {'0':'Go Back','1':'View Halls','2':'Create Hall'}
