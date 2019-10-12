@@ -83,17 +83,18 @@ def navOptions(selection, state):
 def customerController(userObj):
     """This method contains all functionality related to the customer"""
     state = 2
-    customerPage = {'1': 'View Halls', }
-    navPageDict = {'O': 'Logout', 'E': 'Exit'}
-    displayPage('Customer Page', userObj.getFirstName(), customerPage, navPageDict)
-    invalidSelectionFlag, selection = selectOption(customerPage, navPageDict)
-    # for navigation menu
-    if not invalidSelectionFlag:
-        if selection in navPageDict:
-            state = navOptions(selection, state)
+    while state == 2:
+        customerPage = {'1': 'View Halls', }
+        navPageDict = {'O': 'Logout', 'E': 'Exit'}
+        displayPage('Customer Page', userObj.getFirstName(), customerPage, navPageDict)
+        invalidSelectionFlag, selection = selectOption(customerPage, navPageDict)
+        # for navigation menu
+        if not invalidSelectionFlag:
+            if selection in navPageDict:
+                state = navOptions(selection, state)
+            else:
+                # take to next state to display hall listing
+                state = 3
         else:
-            # take to next state to display hall listing
-            state = 3
-    else:
-        print('Invalid selection, Please input again')
+            print('Invalid selection, Please input again')
     return state

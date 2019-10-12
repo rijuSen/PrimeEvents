@@ -9,6 +9,7 @@ from user.user import *
 
 from customerController import customerController
 
+
 def navOptions(selection, state):
     if selection == 'O':
         state = 1
@@ -86,7 +87,12 @@ def getPass():
     # check password length more than or equal to 8
     passFlag = False
     while not passFlag:
-        passPlain = getpass.getpass(prompt='Enter Password(must be >= 8): ')
+        try:
+            passPlain = getpass.getpass('Enter Password(must be >= 8): ')
+        except UserWarning:
+            print('Password will be visible')
+        else:
+            passPlain = input('Enter Password(must be >= 8): ')
         if len(passPlain) >= 8:
             passFlag = True
         else:
@@ -115,7 +121,7 @@ def acceptUserDetails():
         if mailExistFlag == True and retryCount < 3:
             print("Mail id already used, try another mail id")
         elif mailExistFlag == True and retryCount == 3:
-            print('Maximum attemps reached, taking back to login page')
+            print('Maximum attempts reached, taking back to login page')
             time.sleep(2)
         else:
             userInfo['password'] = getPass()
