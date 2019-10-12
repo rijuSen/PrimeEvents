@@ -1,151 +1,6 @@
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-import time
-import getpass
-import os
-from user.user import *
-from hall.hall import *
-from controller import Session
-
-def navOptions(selection, state):
-    if selection == 'O':
-        state = 1
-    elif selection == 'B':
-        state = state - 1 
-    elif selection == 'E':
-        state = 0
-    return state
-
-def displayPage(pageName, userName, optionDisplay, pageNavDict):
-    os.system('clear')
-    #Display Page Name
-    print('-'*45)
-    print('{0:^45}'.format(pageName))
-    print('-'*45)
-    #Display User Name
-    if not len(userName) == 0:
-        print('{0:^45}'.format('Logged in as '+userName.capitalize()))
-        print('-'*45)
-    if not len(optionDisplay) == 0:
-        if isinstance(optionDisplay,dict):
-            #Menu Options format
-            print('{:^45}'.format('Input key to select corresponding option'))
-            print('-'*45)
-            print('{0:^10}{1:^30}'.format('[Keys]','Options'))
-            print('-'*45)
-            #display menu
-            for key, option in optionDisplay.items():
-                print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
-            print('-'*45)
-            #navigation panel
-            print('-'*45)
-        if isinstance(optionDisplay,list):
-            #Menu Options format
-            print('Input key to select corresponding option')
-            print('-'*45)
-            #display menu
-            tableHeader = ("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format('Key','Venue','Type','Addr','Capacity'))
-            print("{0:^45}".format(tableHeader))
-            for row in optionDisplay:
-                rowWise = ("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format(row[0],row[1],row[3],row[4],row[5]))
-                print('{:^45}'.format(rowWise))
-            print('-'*45)
-            #navigation panel
-            print('-'*45)
-    if not len(pageNavDict) == 0:
-        navBar = ''
-        for key, option in pageNavDict.items():
-            navBarTemp = '{:^11}'.format('['+key+']'+option)
-            navBar = navBar + navBarTemp
-        print('{:^45}'.format(navBar))
-    print('-'*45)
-
-def selectOption(optionDisplay,pageNavDict):
-    #prompt user to select option
-    selection = input('Enter your selection: ')
-    if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
-        print('Your selection: {}'.format(optionDisplay.get(selection)))
-        return False, selection
-    elif isinstance(optionDisplay, list) and selection.isdigit() and int(selection) <= len(optionDisplay):
-        print('Your selection: {}'.format(optionDisplay[int(selection)-1]))
-        return False, selection
-    elif selection in pageNavDict.keys():
-        print('Your selection: {}'.format(pageNavDict.get(selection)))
-        return False, selection
-    else:
-        print('Selection {} is not a valid. Kindly provide a valid selection'.format(selection))
-        time.sleep(2)
-        return True, ''
-
-
-def getPass():
-    #check password length more than or equal to 8
-    passFlag = False
-    while not passFlag:
-        passPlain = getpass.getpass(prompt='Enter Password(must be >= 8): ')
-        if len(passPlain) >= 8:
-            passFlag = True 
-        else:
-            passFlag = False
-            print("Password must have 8 or more characters")
-    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-    digest.update(bytes(passPlain, 'utf-8'))
-    passHash = digest.finalize()
-    return passHash
-
-def acceptUserDetails():
-    os.system('clear')
-    print('='*41)
-    print('{:^41}'.format('Registration Page'))
-    print('='*41)
-    userInfo = dict()
-    userInfo['firstName'] = input('Enter First Name: ')
-    userInfo['lastName'] = input('Enter Last Name: ')
-    mailExistFlag = True
-    retryCount = 0
-    while mailExistFlag and retryCount < 3:
-        userInfo['email'] = input('Enter Email Id: ')
-        mailExistFlag = Owner.emailExists(userInfo['email'])
-        retryCount = retryCount + 1
-        if mailExistFlag == True and retryCount < 3:
-            print("Mail id already used, try another mail id")
-        elif mailExistFlag == True and retryCount == 3:
-            print('Maximum attemps reached, taking back to login page')
-            time.sleep(2)
-        else:
-            userInfo['password'] = getPass() 
-    return mailExistFlag, userInfo 
-
-def userLogin():
-    loginFlag = False
-    retryCount = 0
-    while not loginFlag and retryCount < 3:
-        userInfo = dict()
-        userInfo['email'] = input('Enter Email Id: ')
-        userInfo['password'] = getPass()
-        userObj = (User(userInfo))
-        retryCount = retryCount + 1
-        loginFlag = userObj.success
-        if not loginFlag and retryCount < 3:
-            print('{}'.format('Mail id, password combination invalid'))
-            success = False
-        elif not loginFlag and retryCount == 3:
-            print('{}'.format('Mail id, password combination invalid'))
-            print('{}'.format('Maximum tries exceeded, redirecting to login page'))
-            time.sleep(2)
-            success = False
-        else:
-            success = True
-    return {'success':success,'userObj':userObj}
-
-
-def displayTableFormat(listData, startIndex):
-    print("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format('ID','Hall-Name','Hall-Type','Hall-Addr','Hall-Capacity'))
-    for row in listData[startIndex:startIndex + 4:1]:
-        print("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format(row[0],row[1],row[3],row[4],row[5]))
-
-
-def main():
+from class CustomerController:
+	"""A controller to moderate customer actions post login"""
+	def main():
     adminPage = {'1':'Manager Users/Owners','2':'Hall Listing','3':'Manage Discounts'}
     registerPage = {'F':'First Name', 'L': 'Last Name', 'E': 'Email', 'P': 'Password'}
     ownerPage = {'1':'Manager Halls','2':'Manage Bookings','3':'View Quotation Request','4':'Manage Payments','5':'Manage Discounts'}
@@ -185,6 +40,7 @@ def main():
                         userObj = Customer(userInfo)
                         print('User info is {}'.format(userInfo))
                         time.sleep(2)
+                        sessionObj = Session(userObj)
                         #print(sessionObj.getSessionId())
                         state = 2
                         #print(customer.getRowId())
@@ -194,7 +50,6 @@ def main():
                         if objDict['userObj'].getAllowFlag() == 0:
                             sessionObj = Session(objDict['userObj'])
                             state = 2
-                            userObj = objDict['userObj']
                         elif objDict['userObj'].getAllowFlag() == 1:
                             print('User blocked, redirecting to login page')
                             time.sleep(2)
@@ -369,4 +224,5 @@ def main():
 
 if __name__=="__main__":
     main()
+
 
