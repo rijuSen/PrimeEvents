@@ -8,6 +8,8 @@ from cryptography.hazmat.primitives import hashes
 from user.user import *
 
 from customerController import customerController
+from ownerController import ownerController
+
 
 def navOptions(selection, state):
     if selection == 'O':
@@ -86,7 +88,10 @@ def getPass():
     # check password length more than or equal to 8
     passFlag = False
     while not passFlag:
-        passPlain = getpass.getpass(prompt='Enter Password(must be >= 8): ')
+        try:
+            passPlain = getpass.getpass('Enter Password(must be >= 8): ')
+        except getpass.GetPassWarning:
+            passPlain = input('Enter Password(must be >= 8): ')
         if len(passPlain) >= 8:
             passFlag = True
         else:
