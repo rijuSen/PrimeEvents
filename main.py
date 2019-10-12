@@ -91,7 +91,6 @@ def getPass():
             passPlain = getpass.getpass('Enter Password(must be >= 8): ')
         except UserWarning:
             print('Password will be visible')
-        else:
             passPlain = input('Enter Password(must be >= 8): ')
         if len(passPlain) >= 8:
             passFlag = True
@@ -214,9 +213,14 @@ def main():
                                                                             userObj.getUserType()))
         # call respective controller to deal with further action
         while state == 2 and userObj.getUserType() == 'Customer':
-            customerController(userObj)
+            state = customerController(userObj)
         while state == 2 and userObj.getUserType() == 'Owner':
-            ownerController(userObj)
+            state = ownerController(userObj)
+        print(state)
+    else:
+        exit()
+
+
 
     #    displayPage('OwnerHomePage',ownerPage)
     #    manageHallPage = {'0':'Go Back','1':'View Halls','2':'Create Hall'}

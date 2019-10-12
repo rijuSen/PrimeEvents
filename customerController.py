@@ -1,8 +1,13 @@
 import os
 import time
+from hall.hall import Hall
 
 
 def displayPage(pageName, userName, optionDisplay, pageNavDict):
+    """if userName exists then will be displayed on selectOption
+    if optionDisplay exists then display
+        if optionDisplay is a dict display as dict
+        if optionDisplay is a list display as list"""
     os.system('clear')
     # Display Page Name
     print('-' * 45)
@@ -54,7 +59,7 @@ def selectOption(optionDisplay, pageNavDict):
         print('Your selection: {}'.format(optionDisplay.get(selection)))
         return False, selection
     elif isinstance(optionDisplay, list) and selection.isdigit() and int(selection) <= len(optionDisplay):
-        print('Your selection: {}'.format(optionDisplay[int(selection) - 1]))
+        print('Your selection: {}'.format(optionDisplay[int(selection)]))
         return False, selection
     elif selection in pageNavDict.keys():
         print('Your selection: {}'.format(pageNavDict.get(selection)))
@@ -84,7 +89,7 @@ def customerController(userObj):
     """This method contains all functionality related to the customer"""
     state = 2
     while state == 2:
-        customerPage = {'1': 'View Halls', }
+        customerPage = {'1': 'View Halls'}
         navPageDict = {'O': 'Logout', 'E': 'Exit'}
         displayPage('Customer Page', userObj.getFirstName(), customerPage, navPageDict)
         invalidSelectionFlag, selection = selectOption(customerPage, navPageDict)
@@ -97,4 +102,44 @@ def customerController(userObj):
                 state = 3
         else:
             print('Invalid selection, Please input again')
+    #display list of halls and provide selection option
+    while state == 3 and selection == '1':
+        hallList = Hall.viewAllHalls()
+        navPageDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+        displayPage('View Halls', userObj.getFirstName(), hallList, navPageDict)
+        invalidSelectionFlag, selection = selectOption(hallList, navPageDict)
+        if not invalidSelectionFlag:
+            if selection in navPageDict:
+                state = navOptions(selection, state)
+            else:
+                state = 4
+        else:
+            print('Invalid selection, Please input again')
+
+    while state == 4:
+        #hallID = input("Enter Hall ID: ")
+        index = int(selection)
+        hallDetails = Hall.viewHallDetails(index)
+        #print(hallDetails)
+        #displayPage('Hall Details', userObj.getFirstName(), hallDetails, navPageDict)
+        # tableHeader = ("{0:^10}{1:^10}{2:^10}{3:^10}".format('Venue', 'Type', 'Addr', 'Capacity'))
+        # print("{}".format(tableHeader))
+        # print("{0:^10}{1:^10}{2:^10}{3:^10}".format(hallDetails[0], hallDetails[2], hallDetails[3], hallDetails[4]))
+        #print('{:^45}'.format(displayFormat))
+        navPageDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+        bookHallPage = {'R': 'Request Quotation'}
+        tempString = '{}\n Venue - {} Type - {} Addr - {} Capacity - {}'.format(userObj.getFirstName(), hallDetails[0], hallDetails[2], hallDetails[3], hallDetails[4])
+        displayPage('Hall Details', '{:^45}'.format(tempString), bookHallPage, navPageDict)
+        invalidSelectionFlag, selection = selectOption(bookHallPage, navPageDict)
+        if not invalidSelectionFlag:
+            if selection in navPageDict:
+                state = navOptions(selection, state)
+            else:
+                state = 5
+        else:
+            print('Invalid selection, Please input again')
+    while state == 5 and selection == 'R':
+        print('Booked')
+        exit()
+
     return state
