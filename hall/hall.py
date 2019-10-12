@@ -26,12 +26,12 @@ class Hall:
             conn.close()
 
 
-    def __init__(self,hallName,ownerId,hallType,hallAddr,hallCapacity):
-        self.hallName = hallName
-        self.ownerId = ownerId
-        self.hallType = hallType
-        self.hallAddr = hallAddr
-        self.hallCapacity = hallCapacity
+    def __init__(self,hallInfo):
+        self.hallName = hallInfo['hallName']
+        self.ownerId = hallInfo['ownerId']
+        self.hallType = hallInfo['hallType']
+        self.hallAddr = hallInfo['hallAddr']
+        self.hallCapacity = hallInfo['hallCapacity']
         self.dbFilePath = Path(Hall.dbFileName)
         #check if database file already exists
         if not self.dbFilePath.is_file():
@@ -50,9 +50,17 @@ class Hall:
 
             #if doesn't exist create table else insert into existing table
             if not tablePresentFlag:
-                c.execute("""CREATE TABLE halls (hallName text NOT NULL,ownerId int, hallType text NOT NULL, hallAddr text NOT NULL, hallCapacity int NOT NULL, UNIQUE(hallName,ownerId) FOREIGN KEY(ownerId) REFERENCES users(rowid))""")
+                c.execute("""CREATE TABLE halls (
+                            hallName text NOT NULL,
+                            ownerId int,
+                            hallType text NOT NULL,
+                            hallAddr text NOT NULL,
+                            hallCapacity int NOT NULL,
+                            UNIQUE(hallName,ownerId),
+                            FOREIGN KEY(ownerId) REFERENCES users(rowid))
+                            """)
             else:
-                self.insertIntoHallDb(hallName,ownerId,hallType,hallAddr,hallCapacity)
+                self.insertIntoHallDb(self.hallName,self.ownerId,self.hallType,self.hallAddr,self.hallCapacity)
             conn.close()
 
     @classmethod
@@ -98,6 +106,16 @@ class Hall:
         return output
 
     @classmethod
+    def viewUserHalls(cls, userObj):
+        conn = sqlite3.connect(Hall.dbFileName)
+        c = conn.cursor()
+        ownerId = userObj.getRowId()
+        c.execute("SELECT rowid,* from halls WHERE ownerId = :ownerId",{'ownerId': ownerId,})
+        output = c.fetchall()
+        conn.close()
+        return output
+
+    @classmethod    
     def viewHallDetails(cls,rowId):
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
@@ -107,3 +125,16 @@ class Hall:
         #print(type(output))
         conn.close()
         return output
+
+
+    @classmethod
+    def hallExists(cls, hallName, userObj):
+        conn = sqlite3.connect(Hall.dbFileName)
+        c = conn.cursor()
+        ownerId = userObj.getRowId()
+        c.execute("SELECT count(*) FROM halls WHERE ownerId = :ownerId AND hallName = :hallName",{'ownerId': ownerId, 'hallName': hallName})
+        data = c.fetchone()[0]
+        if data == 0:
+            return False
+        else:
+            return True

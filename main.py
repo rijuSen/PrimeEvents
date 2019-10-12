@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives import hashes
 from user.user import *
 
 from customerController import customerController
+from ownerController import ownerController
 
 
 def navOptions(selection, state):
@@ -120,7 +121,7 @@ def acceptUserDetails():
         if mailExistFlag == True and retryCount < 3:
             print("Mail id already used, try another mail id")
         elif mailExistFlag == True and retryCount == 3:
-            print('Maximum attempts reached, taking back to login page')
+            print('Maximum attemps reached, taking back to login page')
             time.sleep(2)
         else:
             userInfo['password'] = getPass()
