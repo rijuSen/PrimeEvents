@@ -26,7 +26,7 @@ class Booking:
             with conn:
                 c.execute("INSERT INTO Bookings VALUES (:bookingStartDate, :bookingEndDate, :hallId, :customerId, :status, :bookingAmount, :quotationId)",
                         { 'bookingStartDate': self.bookingStartDate, 'bookingEndDate': self.bookingEndDate, 'hallId': self.hallId, 'customerId': self.customerId, 'status': self.status, 'bookingAmount': self.bookingAmount, 'quotationId': self.quotationId})
-                c.execute("SELECT rowid from Bookings WHERE quotationId = :quotationId",{'quotationId': self.quotationId,})
+            c.execute("SELECT rowid from Bookings WHERE quotationId = :quotationId",{'quotationId': self.quotationId,})
             #save the rowid of the inserted row in the variable rowId
             for id in c.fetchone():
                 self.rowId = id
