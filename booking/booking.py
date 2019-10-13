@@ -1,210 +1,129 @@
-# class for user in prime events
+#class for Booking in prime events
 import sqlite3
 from pathlib import Path
 
-
-class User:
+class Booking:
     '''docstring'''
-    # class variable to define the path to the DB file
+
+    #class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
-
-    def insertIntoUserDb(self, firstName, lastName, email, password, userType, allowFlag):
-        ''' Function needs arguments --> firstName,lastName,email,password,userType,allowFlag'''
-        self.userDbFilePath = Path(User.dbFileName)
-        
-        # insert entry into database
+    def insertIntoBookingDb(self):
         try:
-            conn = sqlite3.connect(User.dbFileName)
+            conn = sqlite3.connect(Booking.dbFileName)
             c = conn.cursor()
+# CREATE TABLE bookings (
+#                   bookingStartDate date NOT NULL,
+#                   bookingEndDate date NOT NULL,
+#                   hallId int NOT NULL,
+#                   customerId int NOT NULL,
+#                   status boolean NOT NULL,
+#                   bookingAmount float NOT NULL,
+#                   quotationId int NOT NULL,
+#                   UNIQUE(quotationId),
+#                   FOREIGN KEY(customerId) REFERENCES users(rowid),
+#                   FOREIGN KEY(quotationId) REFERENCES quotations(rowid),
+#                   FOREIGN KEY(hallId) REFERENCES halls(rowid));
             with conn:
-                c.execute("INSERT INTO users VALUES (:firstName, :lastName, :email, :password, :userType, :allowFlag)",
-                          {'firstName': firstName, 'lastName': lastName, 'email': email, 'password': password,
-                           'userType': userType, 'allowFlag': allowFlag})
-            c.execute("SELECT rowid from users WHERE email = :email", {'email': email, })
-
-            # save the rowid of the inserted row in the variable rowId
+                c.execute("INSERT INTO Bookings VALUES (:bookingStartDate, :bookingEndDate, :hallId, :customerId, :status, :bookingAmount, :quotationId)",
+                        { 'bookingStartDate': self.bookingStartDate, 'bookingEndDate': self.bookingEndDate, 'hallId': self.hallId, 'customerId': self.customerId, 'status': self.status, 'bookingAmount': self.bookingAmount, 'quotationId': self.quotationId})
+                c.execute("SELECT rowid from Bookings WHERE quotationId = :quotationId",{'quotationId': self.quotationId,})
+            #save the rowid of the inserted row in the variable rowId
             for id in c.fetchone():
                 self.rowId = id
-
-        except sqlite3.Error as sqlite3Error:
-            print("SQLite3 Error : -->", sqlite3Error)
-        finally:
-            conn.close()
-
-    def checkPassword(self, userInfo):
-        email = userInfo['email']
-        password = userInfo['password']
-        conn = sqlite3.connect(self.dbFileName)
-        c = conn.cursor()
-        c.execute(
-            "SELECT rowid, firstName, lastName, email, password, userType, allowFlag FROM users WHERE email = :email AND password = :password",
-            {'email': email, 'password': password})
-        row = c.fetchone()
-        return row
-
-    # def __init__(self,firstName,lastName,email,password,userType):
-
-    def __init__(self, userInfo):
-        # create a new entry in the DB
-        if len(userInfo) == 5:
-            self.firstName = userInfo['firstName']
-            self.lastName = userInfo['lastName']
-            self.email = userInfo['email']
-            self.password = userInfo['password']
-            self.userType = userInfo['userType']
-            self.allowFlag = 0
-            self.insertIntoUserDb(self.firstName, self.lastName, self.email, self.password, self.userType,
-                                  self.allowFlag)
             self.success = True
-        # create an object of an existing entry
-        if len(userInfo) == 2:
-            row = self.checkPassword(userInfo)
-            if not row == None:
-                self.rowId = row[0]
-                self.firstName = row[1]
-                self.lastName = row[2]
-                self.email = row[3]
-                self.password = row[4]
-                self.userType = row[5]
-                self.allowFlag = row[6]
-                self.success = True
-            else:
-                self.success = False
+        except sqlite3.Error as sqlite3Error:
+            self.success = False
+            print("SQLite3 Error : -->",sqlite3Error)
+        finally:
+            conn.close()
 
-    def getSuccess(self):
-        return self.success
 
-    def getFirstName(self):
-        return self.firstName
-
-    def getLastName(self):
-        return self.lastName
-
-    def fullName(self):
-        return '{} {}'.format(self.firstName, self.lastName)
-
-    def getEmail(self):
-        return self.email
-
-    def getRowId(self):
-        return self.rowId
-
-    def getUserType(self):
-        return self.userType
-
-    def getAllowFlag(self):
-        return self.allowFlag
-
-    def deleteUser():
-        pass
+    def __init__(self,bookingInfo):
+        """bookingInfo['bookingStartDate','bookingEndDate','hallId','customerId','bookingAmount','quotationId']"""
+        if len(bookingInfo) == 6:
+            self.bookingStartDate = bookingInfo['bookingStartDate']
+            self.bookingEndDate = bookingInfo['bookingEndDate']
+            self.hallId = bookingInfo['hallId']
+            self.customerId = bookingInfo['customerId']
+            self.status = False
+            self.bookingAmount = bookingInfo['bookingAmount']
+            self.quotationId = bookingInfo['quotationId']
+            self.insertIntoBookingDb()
+        elif len(bookingInfo) == 2:
+            pass
 
     @classmethod
-    def changeDatabase(cls, newDbName):
-        cls.dbFileName = newDbName
-
-    @classmethod
-    def editUser(cls, editEntryWithEmail, firstName, lastName, password):
-        """Only first name, last name and password can be modified"""
+    def editBooking(cls,editBookingOfbookingEndDate,editbookingStartDate,bookingStartDate,customerId,status,bookingAmount):
+        """Except bookingEndDate rest all attributes can be modified"""
         conn = sqlite3.connect(self.dbFileName)
         c = conn.cursor()
         try:
             with conn:
-                c.execute(
-                    """UPDATE users SET firstName = :fname, lastName = :lname, password = :pass WHERE email = :email""",
-                    {'fname': firstName, 'lname': lastName, 'password': password, 'email': editEntryWithEmail})
+                c.execute("""UPDATE Bookings SET bookingStartDate = :hname, customerId = :hType, status = :hAddr, bookingAmount = :hCapacity WHERE bookingEndDate = :oId AND bookingStartDate = :bookingStartDate""",{'hname': bookingStartDate, 'hType': customerId, 'hAddr': status, 'hCapacity': bookingAmount, 'bookingEndDate': editBookingOfbookingEndDate, 'bookingStartDate': editbookingStartDate })
         except sqlite3.Error as sqlite3Error:
-            print("SQLite3 Error -->", sqlite3Error)
+            print("SQLite3 Error -->",sqlite3Error)
         finally:
             conn.close()
+
+
+
+    def getBookingStartDate(self):
+        return self.bookingStartDate
+
+    def getBookingEndDate(self):
+        return self.bookingEndDate
+
+    def getCustomerId(self):
+        return self.customerId
+
+    def getStatus():
+        return self.status
+
+    def getBookingAmount():
+        return bookingAmount
+
 
     @classmethod
-    def emailExists(cls, email):
-        conn = sqlite3.connect(cls.dbFileName)
+    def viewAllBookings(cls):
+        conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
-        c.execute("SELECT count(*) FROM users WHERE email = :email", {'email': email, })
-        data = c.fetchone()[0]
-        if data == 0:
-            return False
-        else:
-            return True
-
-
-#    @classmethod
-#    def displayEntry(cls,email):
-#        conn = sqlite3.connect(cls.dbFileName)
-#        c = conn.cursor()
-#        c.execute("SELECT firstName, lastName, email,  from users WHERE email = :email",{'email': email,})
-#        for column in c.fetchone():
-
-# take a mail id and password and return a user object
-
-
-class Owner(User):
-    '''Owner class extending User'''
-
-    def __init__(self, userInfo):
-        userInfo['userType'] = "Owner"
-        super().__init__(userInfo)
-
-    def getOwnerHalls(userId):
-        pass
-
-    def listOwnerQuotationRequests(userId):
-        pass
-
-    def listOwnerBookings(userId):
-        pass
-
-
-class Customer(User):
-    '''Customer class extending User'''
-
-    def __init__(self, userInfo):
-        userInfo['userType'] = "Customer"
-        super().__init__(userInfo)
-
-    def getCustomerBookingHistory(userId):
-        pass
-
-    def getCustomerQuotationRequestHistory(userId):
-        pass
-
-
-class Admin(User):
-    '''Admin class extending User'''
-
-    def __init__(self, firstName, lastName, email, password):
-        self.userType = "Admin"
-        super().__init__(firstName, lastName, email, password, self.userType)
-
-    def viewAllUsers():
-        conn = sqlite3.connect(User.dbFileName)
-        c = conn.cursor()
-        c.execute("SELECT rowid,firstName, lastName, email, userType, allowFlag FROM users")
-        output = c.fetchall()
-        for entry in output:
-            print(entry, end='\n')
+        c.execute("SELECT rowid,* FROM Bookings")
+        output = c.fetcBooking()
+        #print(output)
+        #print(type(output))
         conn.close()
+        return output
 
-    def blockUser(rowid):
-        conn = sqlite3.connect(User.dbFileName)
+    @classmethod
+    def viewUserBookings(cls, userObj):
+        conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
-        try:
-            with conn:
-                # c.execute("SELECT last_insert_rowid()")
-                # print(c.fetchall())
-                c.execute("""UPDATE users SET allowFlag = :allowFlag WHERE rowid = :rowid""",
-                          {'allowFlag': 1, 'rowid': rowid})
-                # print(c.fetchone())
-                # if 'None' in str(c.fetchone()):
-                #   print('Id:',rowid,'is not present in the database')
-            # else:
-            #    c.execute("SELECT rowid,* FROM users WHERE rowid = :rowid",{'rowid': rowid,})
-            #   print(c.fetchone())
-        except sqlite3.Error as sqlite3Error:
-            print("SQLite3 Error -->", sqlite3Error)
-        finally:
-            conn.close()
+        bookingEndDate = userObj.getRowId()
+        c.execute("SELECT rowid,* from Bookings WHERE bookingEndDate = :bookingEndDate",{'bookingEndDate': bookingEndDate,})
+        output = c.fetcBooking()
+        conn.close()
+        return output
 
-    def viewAllBookings():
-        pass
+    @classmethod
+    def viewBookingDetails(cls,rowId):
+        conn = sqlite3.connect(Booking.dbFileName)
+        c = conn.cursor()
+        c.execute("""SELECT rowid, * FROM Bookings WHERE rowid = :rowId""",{'rowId' : rowId, })
+        output = c.fetchone()
+        #print(output)
+        #print(type(output))
+        conn.close()
+        return output
+
+
+    # @classmethod
+    # def BookingExists(cls, bookingStartDate, userObj):
+    #     conn = sqlite3.connect(Booking.dbFileName)
+    #     c = conn.cursor()
+    #     bookingEndDate = userObj.getRowId()
+    #     c.execute("SELECT count(*) FROM Bookings WHERE bookingEndDate = :bookingEndDate AND bookingStartDate = :bookingStartDate",{'bookingEndDate': bookingEndDate, 'bookingStartDate': bookingStartDate})
+    #     data = c.fetchone()[0]
+    #     if data == 0:
+    #         return False
+    #     else:
+    #         return True
