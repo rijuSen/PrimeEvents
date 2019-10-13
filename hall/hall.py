@@ -115,11 +115,11 @@ class Hall:
         conn.close()
         return output
 
-    @classmethod    
+    @classmethod
     def viewHallDetails(cls,rowId):
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
-        c.execute("""SELECT * FROM halls WHERE rowid = :rowId""",{'rowId' : rowId, })
+        c.execute("""SELECT rowid, * FROM halls WHERE rowid = :rowId""",{'rowId' : rowId, })
         output = c.fetchone()
         #print(output)
         #print(type(output))

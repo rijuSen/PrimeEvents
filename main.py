@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives import hashes
 
 from user.user import *
 
-from customerController import customerController
+from customerController import *
 from ownerController import ownerController
 
 
@@ -21,7 +21,7 @@ def navOptions(selection, state):
     return state
 
 
-def displayPage(pageName, userName, optionDisplay, pageNavDict):
+# def displayPage(pageName, userName, optionDisplay, pageNavDict):
     os.system('clear')
     # Display Page Name
     print('-' * 45)
@@ -66,7 +66,7 @@ def displayPage(pageName, userName, optionDisplay, pageNavDict):
     print('-' * 45)
 
 
-def selectOption(optionDisplay, pageNavDict):
+# def selectOption(optionDisplay, pageNavDict):
     # prompt user to select option
     selection = input('Enter your selection: ')
     if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
