@@ -27,43 +27,17 @@ class Hall:
 
 
     def __init__(self,hallInfo):
-        self.hallName = hallInfo['hallName']
-        self.ownerId = hallInfo['ownerId']
-        self.dayTariff = hallInfo['dayTariff']
-        self.hallType = hallInfo['hallType']
-        self.hallAddr = hallInfo['hallAddr']
-        self.hallCapacity = hallInfo['hallCapacity']
-        self.dbFilePath = Path(Hall.dbFileName)
-        #check if database file already exists
-        # if not self.dbFilePath.is_file():
-        #     print('Database file not created, run User class to create database files')
-        # else:
-        #     conn = sqlite3.connect(Hall.dbFileName)
-        #     c = conn.cursor()
-        #     #check if table halls exists in the database
-        #     c.execute('select name from sqlite_master where type = "table"')
-        #     temp = c.fetchall()
-        #     tablePresentFlag = False
-        #     for tup in temp:
-        #         for val in tup:
-        #             if 'halls' in val:
-        #                 tablePresentFlag = True
-        #
-        #     #if doesn't exist create table else insert into existing table
-        #     if not tablePresentFlag:
-        #         c.execute("""CREATE TABLE halls (
-        #                     hallName text NOT NULL,
-        #                     ownerId int,
-        #                     dayTariff int,
-        #                     hallType text NOT NULL,
-        #                     hallAddr text NOT NULL,
-        #                     hallCapacity int NOT NULL,
-        #                     UNIQUE(hallName,ownerId),
-        #                     FOREIGN KEY(ownerId) REFERENCES users(rowid))
-        #                     """)
-        #     else:
-        self.insertIntoHallDb(self.hallName,self.ownerId,self.hallType,self.hallAddr,self.hallCapacity, self.dayTariff)
-        #    conn.close()
+        if len(hallInfo) == 6:
+            self.hallName = hallInfo['hallName']
+            self.ownerId = hallInfo['ownerId']
+            self.dayTariff = hallInfo['dayTariff']
+            self.hallType = hallInfo['hallType']
+            self.hallAddr = hallInfo['hallAddr']
+            self.hallCapacity = hallInfo['hallCapacity']
+            self.dbFilePath = Path(Hall.dbFileName)
+            self.insertIntoHallDb(self.hallName,self.ownerId,self.hallType,self.hallAddr,self.hallCapacity, self.dayTariff)
+        #if len(hallInfo) == 2:
+
 
     @classmethod
     def editHall(cls,editHallOfOwnerId,editHallName,hallName,hallType,hallAddr,hallCapacity):
@@ -140,3 +114,29 @@ class Hall:
             return False
         else:
             return True
+
+    @classmethod
+    def deletehall(cls,rowId):
+        conn = sqlite3.connect(Hall.dbFileName)
+        c = conn.cursor()
+        with conn:
+            c.execute("""DELETE FROM halls WHERE rowid = :rowId""",{'rowId' : rowId, })
+        output = c.fetchone()
+        #print(output)
+        #print(type(output))
+        conn.close()
+        return output
+
+
+    @classmethod
+    def modifyhall(cls,rowId, hallInfo):
+        conn = sqlite3.connect(Hall.dbFileName)
+        c = conn.cursor()
+        with conn:
+            c.execute("""UPDATE halls SET hallName = :hallName, dayTariff = :dayTariff, hallType = :hallType, hallAddr = :hallAddr, hallCapacity = :hallCapacity WHERE rowid = :rowId""",
+                    {'rowId' : rowId, 'hallName': hallInfo['hallName'], 'hallType': hallInfo['hallType'], 'hallAddr': hallInfo['hallAddr'], 'hallCapacity': hallInfo['hallCapacity'], 'dayTariff': hallInfo['dayTariff']})
+        output = c.fetchone()
+        #print(output)
+        #print(type(output))
+        conn.close()
+        return output
