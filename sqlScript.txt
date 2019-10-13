@@ -1,0 +1,39 @@
+CREATE TABLE quotation (reqDate date NOT NULL, hallId int NOT NULL, customerId int NOT NULL, status boolean NOT NULL, quotationAmount float NOT NULL, UNIQUE(reqDate, customerId, hallId), FOREIGN KEY(customerId) REFERENCES users(rowid), FOREIGN KEY(hallId) REFERENCES halls(rowid))
+
+
+CREATE TABLE quotations (
+                  reqDate datetime NOT NULL,
+                  bookingStartDate date NOT NULL,
+                  bookingEndDate date NOT NULL,
+                  hallId int NOT NULL,
+                  customerId int NOT NULL,
+                  status boolean NOT NULL,
+                  quotationAmount float NOT NULL,
+                  UNIQUE(reqDate, customerId, hallId),
+                  FOREIGN KEY(customerId) REFERENCES users(rowid),
+                  FOREIGN KEY(hallId) REFERENCES halls(rowid));
+
+CREATE TABLE bookings (
+                  bookingStartDate date NOT NULL,
+                  bookingEndDate date NOT NULL,
+                  hallId int NOT NULL,
+                  customerId int NOT NULL,
+                  status boolean NOT NULL,
+                  bookingAmount float NOT NULL,
+                  quotationId int NOT NULL,
+                  UNIQUE(quotationId),
+                  FOREIGN KEY(customerId) REFERENCES users(rowid),
+                  FOREIGN KEY(quotationId) REFERENCES quotations(rowid),
+                  FOREIGN KEY(hallId) REFERENCES halls(rowid));
+
+DROP TABLE halls;
+
+CREATE TABLE halls (
+                    hallName text NOT NULL,
+                    ownerId int,
+                    dayTariff float,
+                    hallType text NOT NULL,
+                    hallAddr text NOT NULL,
+                    hallCapacity int NOT NULL,
+                    UNIQUE(hallName,ownerId),
+                    FOREIGN KEY(ownerId) REFERENCES users(rowid));

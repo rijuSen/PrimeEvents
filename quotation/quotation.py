@@ -9,14 +9,14 @@ class Quotation:
     # class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
 
-    def insertIntoUserDb(self, reqDate, hallId, customerId, status, quotationAmount):
+    def insertIntoUserDb(self, reqDate, hallId, customerId, status, quotationAmount, bookingStartDate, bookingEndDate):
         try:
             conn = sqlite3.connect(Quotation.dbFileName)
             c = conn.cursor()
             with conn:
-                c.execute("INSERT INTO quotation VALUES (:reqDate, :hallId, :customerId, :status, :quotationAmount)",
+                c.execute("INSERT INTO quotation VALUES (:reqDate, :hallId, :customerId, :status, :quotationAmount, :bookingStartDate, :bookingEndDate)",
                           {'reqDate': reqDate, 'hallId': hallId, 'customerId': customerId, 'status': status,
-                           'quotationAmount': quotationAmount})
+                           'quotationAmount': quotationAmount, 'bookingStartDate': bookingStartDate, 'bookingEndDate': bookingEndDate})
             c.execute("SELECT rowid from quotation WHERE reqDate = :reqDate AND hallId = :hallId AND customerId = "
                       ":customerId",
                       {'reqDate': reqDate, 'hallId': hallId, 'customerId': customerId})
@@ -33,26 +33,14 @@ class Quotation:
     def __init__(self, quoDict):
         self.quotationDbFilePath = Path(Quotation.dbFileName)
         # check if database file already exists
-        if not self.quotationDbFilePath.is_file():
-            conn = sqlite3.connect(Quotation.dbFileName)
-            c = conn.cursor()
-            c.execute("""CREATE TABLE quotation (
-                        reqDate date NOT NULL, 
-                        hallId int NOT NULL,
-                        customerId int NOT NULL,
-                        status boolean NOT NULL,
-                        quotationAmount float NOT NULL,
-                        UNIQUE(reqDate, customerId, hallId),
-                        FOREIGN KEY(customerId) REFERENCES users(rowid),
-                        FOREIGN KEY(hallId) REFERENCES halls(rowid))
-                        """)
-            conn.close()
         self.reqDate = quoDict['reqDate']
         self.hallId = quoDict['hallId']
         self.customerId = quoDict['customerId']
         self.status = False
         self.quotationAmount = quoDict['quotationAmount']
-        self.insertIntoUserDb(self.date, self.hallId, self.customerId, self.status, self.quotationAmount)
+        self.bookingStartDate = quoDict['bookingStartDate']
+        self.bookingEndDate = quoDict['bookingEndDate']
+        self.insertIntoUserDb(self.date, self.hallId, self.customerId, self.status, self.quotationAmount, self.bookingStartDate, self.bookingEndDate)
 
     def getReqDate(self):
         return self.reqDate

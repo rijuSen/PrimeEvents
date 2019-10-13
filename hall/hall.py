@@ -7,13 +7,13 @@ class Hall:
 
     #class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
-    def insertIntoHallDb(self,hallName,ownerId,hallType,hallAddr,hallCapacity):
+    def insertIntoHallDb(self,hallName,ownerId,hallType,hallAddr,hallCapacity, dayTariff):
         try:
             conn = sqlite3.connect(Hall.dbFileName)
             c = conn.cursor()
             with conn:
-                c.execute("INSERT INTO halls VALUES (:hallName, :ownerId, :hallType, :hallAddr, :hallCapacity)",
-                        {'hallName': hallName, 'ownerId': ownerId, 'hallType': hallType, 'hallAddr': hallAddr, 'hallCapacity': hallCapacity})
+                c.execute("INSERT INTO halls VALUES (:hallName, :ownerId, :dayTariff, :hallType, :hallAddr, :hallCapacity)",
+                        {'hallName': hallName, 'ownerId': ownerId, 'hallType': hallType, 'hallAddr': hallAddr, 'hallCapacity': hallCapacity, 'dayTariff': dayTariff})
 
             c.execute("SELECT rowid from halls WHERE hallName = :hallName AND ownerId = :ownerId",{'hallName': hallName,'ownerId': ownerId})
             #save the rowid of the inserted row in the variable rowId
@@ -29,39 +29,41 @@ class Hall:
     def __init__(self,hallInfo):
         self.hallName = hallInfo['hallName']
         self.ownerId = hallInfo['ownerId']
+        self.dayTariff = hallInfo['dayTariff']
         self.hallType = hallInfo['hallType']
         self.hallAddr = hallInfo['hallAddr']
         self.hallCapacity = hallInfo['hallCapacity']
         self.dbFilePath = Path(Hall.dbFileName)
         #check if database file already exists
-        if not self.dbFilePath.is_file():
-            print('Database file not created, run User class to create database files')
-        else:
-            conn = sqlite3.connect(Hall.dbFileName)
-            c = conn.cursor()
-            #check if table halls exists in the database
-            c.execute('select name from sqlite_master where type = "table"')
-            temp = c.fetchall()
-            tablePresentFlag = False
-            for tup in temp:
-                for val in tup:
-                    if 'halls' in val:
-                        tablePresentFlag = True
-
-            #if doesn't exist create table else insert into existing table
-            if not tablePresentFlag:
-                c.execute("""CREATE TABLE halls (
-                            hallName text NOT NULL,
-                            ownerId int,
-                            hallType text NOT NULL,
-                            hallAddr text NOT NULL,
-                            hallCapacity int NOT NULL,
-                            UNIQUE(hallName,ownerId),
-                            FOREIGN KEY(ownerId) REFERENCES users(rowid))
-                            """)
-            else:
-                self.insertIntoHallDb(self.hallName,self.ownerId,self.hallType,self.hallAddr,self.hallCapacity)
-            conn.close()
+        # if not self.dbFilePath.is_file():
+        #     print('Database file not created, run User class to create database files')
+        # else:
+        #     conn = sqlite3.connect(Hall.dbFileName)
+        #     c = conn.cursor()
+        #     #check if table halls exists in the database
+        #     c.execute('select name from sqlite_master where type = "table"')
+        #     temp = c.fetchall()
+        #     tablePresentFlag = False
+        #     for tup in temp:
+        #         for val in tup:
+        #             if 'halls' in val:
+        #                 tablePresentFlag = True
+        #
+        #     #if doesn't exist create table else insert into existing table
+        #     if not tablePresentFlag:
+        #         c.execute("""CREATE TABLE halls (
+        #                     hallName text NOT NULL,
+        #                     ownerId int,
+        #                     dayTariff int,
+        #                     hallType text NOT NULL,
+        #                     hallAddr text NOT NULL,
+        #                     hallCapacity int NOT NULL,
+        #                     UNIQUE(hallName,ownerId),
+        #                     FOREIGN KEY(ownerId) REFERENCES users(rowid))
+        #                     """)
+        #     else:
+        self.insertIntoHallDb(self.hallName,self.ownerId,self.hallType,self.hallAddr,self.hallCapacity, self.dayTariff)
+        #    conn.close()
 
     @classmethod
     def editHall(cls,editHallOfOwnerId,editHallName,hallName,hallType,hallAddr,hallCapacity):
