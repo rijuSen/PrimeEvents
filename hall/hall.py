@@ -7,13 +7,23 @@ class Hall:
 
     #class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
+    # CREATE TABLE halls (
+    #                 hallName text NOT NULL,
+    #                 ownerId int,
+    #                 dayTariff float,
+    #                 hallType text NOT NULL,
+    #                 hallAddr text NOT NULL,
+    #                 hallCapacity int NOT NULL,
+    #                 UNIQUE(hallName,ownerId),
+    #                 FOREIGN KEY(ownerId) REFERENCES users(rowid));
+
     def insertIntoHallDb(self,hallName,ownerId,hallType,hallAddr,hallCapacity, dayTariff):
         try:
             conn = sqlite3.connect(Hall.dbFileName)
             c = conn.cursor()
             with conn:
                 c.execute("INSERT INTO halls VALUES (:hallName, :ownerId, :dayTariff, :hallType, :hallAddr, :hallCapacity)",
-                        {'hallName': hallName, 'ownerId': ownerId, 'hallType': hallType, 'hallAddr': hallAddr, 'hallCapacity': hallCapacity, 'dayTariff': dayTariff})
+                        {'hallName': hallName, 'ownerId': ownerId, 'dayTariff': dayTariff, 'hallType': hallType, 'hallAddr': hallAddr, 'hallCapacity': hallCapacity})
 
             c.execute("SELECT rowid from halls WHERE hallName = :hallName AND ownerId = :ownerId",{'hallName': hallName,'ownerId': ownerId})
             #save the rowid of the inserted row in the variable rowId
@@ -26,6 +36,7 @@ class Hall:
             conn.close()
 
 
+        
     def __init__(self,hallInfo):
         if len(hallInfo) == 6:
             self.hallName = hallInfo['hallName']
@@ -36,7 +47,26 @@ class Hall:
             self.hallCapacity = hallInfo['hallCapacity']
             self.dbFilePath = Path(Hall.dbFileName)
             self.insertIntoHallDb(self.hallName,self.ownerId,self.hallType,self.hallAddr,self.hallCapacity, self.dayTariff)
-        #if len(hallInfo) == 2:
+        if len(hallInfo) == 1:
+            self.rowId = hallInfo['hallId']
+            row = Hall.viewHallDetails(self.rowId)
+            # CREATE TABLE halls (
+            #         hallName text NOT NULL,
+            #         ownerId int,
+            #         dayTariff float,
+            #         hallType text NOT NULL,
+            #         hallAddr text NOT NULL,
+            #         hallCapacity int NOT NULL,
+            #         UNIQUE(hallName,ownerId),
+            #         FOREIGN KEY(ownerId) REFERENCES users(rowid));
+
+            # print('Row is of type', type(row))
+            self.hallName = row[1]
+            self.ownerId = row[2]
+            self.dayTariff = row[3]
+            self.hallType = row[4]
+            self.hallAddr = row[5]
+            self.hallCapacity = row[6]
 
 
     @classmethod

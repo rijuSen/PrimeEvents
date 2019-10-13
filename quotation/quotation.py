@@ -10,6 +10,12 @@ class Quotation:
     # class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
 
+    def __repr__(self):
+        return "Quotation({}{}{}{}{})".format()
+
+    def __str__(self):
+        pass
+
 # CREATE TABLE quotations (
 #                   reqDate datetime NOT NULL,
 #                   bookingStartDate date NOT NULL,
@@ -28,13 +34,12 @@ class Quotation:
             c = conn.cursor()
             print('Log point 2')
             with conn:
-                c.execute("INSERT INTO quotations VALUES (:reqDate, :hallId, :customerId, :status, :quotationAmount, :bookingStartDate, :bookingEndDate)",
-                          {'reqDate': self.reqDate, 'hallId': self.hallId, 'customerId': self.customerId, 'status': self.status,
-                           'quotationAmount': self.quotationAmount, 'bookingStartDate': self.bookingStartDate, 'bookingEndDate': self.bookingEndDate})
+                c.execute("INSERT INTO quotations VALUES (:reqDate, :bookingStartDate, :bookingEndDate, :hallId, :customerId, :status, :quotationAmount)",
+                          {'reqDate': self.reqDate, 'bookingStartDate': self.bookingStartDate, 'bookingEndDate': self.bookingEndDate, 'hallId': self.hallId, 'customerId': self.customerId, 'status': self.status, 'quotationAmount': self.quotationAmount })
                 # print('Log point 3')
                 # print('Hall ID = ',self.hallId,' and customer id =', self.customerId)
                 # input('breakpoint')
-            c.execute("SELECT rowid from quotations WHERE reqDate = :reqDate", {'reqDate': self.reqDate,})
+            c.execute("SELECT rowid from quotations WHERE reqDate = :reqDate AND hallId = :hallId AND customerId = :customerId" , {'reqDate': self.reqDate, 'hallId': self.hallId, 'customerId': self.customerId})
             # c.execute("SELECT rowid from quotations WHERE reqDate = :reqDate AND hallId = :hallId AND customerId = :customerId",
                       # {'reqDate': self.reqDate, 'hallId': self.hallId, 'customerId': self.customerId})
             self.success = True
@@ -71,6 +76,7 @@ class Quotation:
     def __init__(self, quoDict):
         """docstring"""
         if len(quoDict) == 6:
+            # input('first if statement')
             # check if database file already exists
             self.reqDate = quoDict['reqDate']
             self.hallId = quoDict['hallId']
@@ -79,12 +85,15 @@ class Quotation:
             self.quotationAmount = quoDict['quotationAmount']
             self.bookingStartDate = quoDict['bookingStartDate']
             self.bookingEndDate = quoDict['bookingEndDate']
-            print('Log point 1')
+            print('Pass dictionary',quoDict)
+            # input('breakpoint')
+
             self.insertIntoUserDb()
         elif len(quoDict) == 1:
+            # input('second if statement')
             self.rowId = quoDict['quotationId']
             row = getQuotationEntry()
-            print('Row is of type', type(row))
+            # print('Row is of type', type(row))
             self.reqDate = row[1]
             self.hallId = row[4]
             self.customerId = row[5]

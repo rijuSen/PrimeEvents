@@ -112,7 +112,9 @@ def navOptions(selection, state):
         state = 0
     return state
 
-def calculateQuote(sDate,eDate):
+def calculateQuote(sDate,eDate,hallId):
+    # hallObj = Hall(hallId)
+    # hallObj.getDa()
     return 2000
 
 def acceptDate(startDate = None):
@@ -228,26 +230,6 @@ def customerController(userObj):
             else:
                 print('Invalid selection, Please input again')
 
-# self.reqDate = quoDict['reqDate']
-# self.hallId = quoDict['hallId']
-# self.customerId = quoDict['customerId']
-# self.status = False
-# self.quotationAmount = quoDict['quotationAmount']
-# self.bookingStartDate = quoDict['bookingStartDate']
-# self.bookingEndDate = quoDict['bookingEndDate']
-# CREATE TABLE quotations (
-#                   reqDate datetime NOT NULL,
-#                   bookingStartDate date NOT NULL,
-#                   bookingEndDate date NOT NULL,
-#                   hallId int NOT NULL,
-#                   customerId int NOT NULL,
-#                   status boolean NOT NULL,
-#                   quotationAmount float NOT NULL,
-#                   UNIQUE(reqDate, customerId, hallId),
-#                   FOREIGN KEY(customerId) REFERENCES users(rowid),
-#                   FOREIGN KEY(hallId) REFERENCES halls(rowid));
-
-        #triggered when request quotation is selected
         while state == 6:
             quotationInfo = dict()
             quotationInfo['reqDate'] = datetime.datetime.now()
@@ -279,7 +261,7 @@ def customerController(userObj):
                 state = navOptions('B', state)
             quotationInfo['hallId'] = index
             quotationInfo['customerId'] = userObj.getRowId()
-            quotationInfo['quotationAmount'] = calculateQuote(quotationInfo['bookingStartDate'], quotationInfo['bookingEndDate'])
+            quotationInfo['quotationAmount'] = calculateQuote(quotationInfo['bookingStartDate'], quotationInfo['bookingEndDate'], quotationInfo['hallId'])
             print('Charge for booking from {} to {} is {}.'.format(quotationInfo['bookingStartDate'].isoformat(),quotationInfo['bookingEndDate'].isoformat(),quotationInfo['quotationAmount']))
             customerConfirmCounter = 3
             while customerConfirmCounter > 0:
@@ -305,7 +287,7 @@ def customerController(userObj):
         while state == 7:
             quotationObj = Quotation(quotationInfo)
             quotationList = Quotation.listQuotationRequests(userObj.getRowId())
-            print(quotationList)
+            print(type(quotationList))
             time.sleep(3)
             displayPage('Quotation Requests', userObj.getFirstName(), quotationList, navPageDict)
             placeholder = dict()
@@ -314,6 +296,7 @@ def customerController(userObj):
             if not invalidSelectionFlag:
                 if selection in navPageDict:
                     state = navOptions(selection, state)
+                    state = state - 1
             else:
                 print('Invalid selection, Please input again')
 
