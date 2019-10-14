@@ -1,8 +1,9 @@
 import os
 import time
 from hall.hall import Hall
+from quotation.quotation import Quotation
 
-def displayPage(pageName, userName, optionDisplay, pageNavDict, message = None):
+def displayPage(pageName, userName, optionDisplay, pageNavDict, state = 2, message = None):
     """if userName exists then will be displayed on selectOption
     if optionDisplay exists then display
         if optionDisplay is a dict display as dict
@@ -32,16 +33,21 @@ def displayPage(pageName, userName, optionDisplay, pageNavDict, message = None):
             print('-' * 65)
             # navigation panel
         if isinstance(optionDisplay, list):
-            # print("Its a list")
-            # time.sleep(2)
+
             # Menu Options format
             print('{:^65}'.format('Input key to select corresponding option'))
             print('-' * 65)
             # display menu
-            tableHeader = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format('Key', 'Venue', 'Tariff','Type', 'Addr', 'Capacity'))
+            if state == 3:
+                tableHeader = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format('Key', 'Venue', 'Tariff','Type', 'Addr', 'Capacity'))
+            elif state == 5:
+                tableHeader = ("{0:^5}{1:^12}{2:^12}{3:^6}{4:^10}{5:^10}{6:^10}".format('Key', 'StartDate', 'EndDate','Venue', 'Customer', 'Status','Amount'))
             print("{0:^65}".format(tableHeader))
             for row in optionDisplay:
-                rowWise = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format(row[0], row[1], row[3], row[4], row[5], row[6]))
+                if state == 3:
+                    rowWise = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format(row[0], row[1], row[3], row[4], row[5], row[6]))
+                elif state == 5:
+                    rowWise = ("{0:^5}{1:^12}{2:^12}{3:^6}{4:^10}{5:^10}{6:^10}".format(row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
                 print('{:^65}'.format(rowWise))
             print('-' * 65)
             # navigation panel
@@ -53,12 +59,18 @@ def displayPage(pageName, userName, optionDisplay, pageNavDict, message = None):
             # print('Input key to select corresponding option')
             # print('-' * 65)
             # display menu
-            tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format('Key', 'Venue', 'Type', 'Addr', 'Capacity'))
+            if state == 4:
+                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format('Key', 'Venue', 'Type', 'Addr', 'Capacity'))
+            elif state == 6:
+                tableHeader = ("{0:^5}{1:^12}{2:^12}{3:^6}{4:^10}{5:^10}{6:^10}".format('Key', 'StartDate', 'EndDate','Venue', 'Customer', 'Status','Amount'))
             print("{0:^65}".format(tableHeader))
             # tempList = str(optionDisplay).split(',')
             # print(tempList)
             # for value in optionDisplay:
-            tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(optionDisplay[0], optionDisplay[1], optionDisplay[3], optionDisplay[4], optionDisplay[5]))
+            if state == 4:
+                tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(optionDisplay[0], optionDisplay[1], optionDisplay[3], optionDisplay[4], optionDisplay[5]))
+            elif state == 6:
+                tempString = ("{0:^5}{1:^12}{2:^12}{3:^6}{4:^10}{5:^10}{6:^10}".format(optionDisplay[0], optionDisplay[1], optionDisplay[2], optionDisplay[3], optionDisplay[4], optionDisplay[5], optionDisplay[6]))
             print('{:^65}'.format(tempString))
             print('-' * 65)
         if not message == None:
@@ -137,11 +149,11 @@ def acceptHallDetails(userObj):
 def acceptModifyHallDetails(userObj, optionDisplay):
     os.system('clear')
     print('=' * 65)
-    print('{:^65}'.format('New Hall Page'))
+    print('{:^65}'.format('Modify Hall Page'))
     print('=' * 65)
-    tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format('Key', 'Venue', 'Type', 'Addr', 'Capacity'))
+    tableHeader = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format('Key', 'Venue', 'Tariff','Type', 'Addr', 'Capacity'))
     print("{0:^65}".format(tableHeader))
-    tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(optionDisplay[0], optionDisplay[1], optionDisplay[3], optionDisplay[4], optionDisplay[5]))
+    tempString = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format(optionDisplay[0], optionDisplay[1], optionDisplay[3], optionDisplay[4], optionDisplay[5], optionDisplay[6]))
     print('{:^65}'.format(tempString))
     print('-' * 65)
     hallInfo = dict()
@@ -170,9 +182,9 @@ def ownerController(userObj):
     state = 2
     while state >= 2:
         while state == 2:
-            ownerPage = {'1': 'Manage Halls', '2': 'Manage Bookings', '3': 'View Quotation Request', '4': 'Manage Payments'}
+            ownerPage = {'1': 'Manage Halls', '2': 'View Quotation Request', '3': 'Manage Bookings', '4': 'Manage Payments'}
             navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
-            displayPage('Owner Page', userObj.getFirstName(), ownerPage, navPageDict)
+            displayPage('Owner Page', userObj.getFirstName(), ownerPage, navPageDict, state)
             invalidSelectionFlag, selection = selectOption(ownerPage, navPageDict)
             # for navigation menu
             if not invalidSelectionFlag:
@@ -183,15 +195,17 @@ def ownerController(userObj):
                     state = 3
                 elif selection == '2':
                     state = 5
-                elif selection == '4':
+                elif selection == '3':
                     state = 6
+                elif selection == '4':
+                    state = 7
             else:
                 print('Invalid selection, Please input again')
 
         while state == 3:
                 hallList = Hall.viewUserHalls(userObj)
                 navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back', 'A': 'Add New Hall'}
-                displayPage('Manage Hall Page', userObj.getFirstName(), hallList, navPageDict)
+                displayPage('Manage Hall Page', userObj.getFirstName(), hallList, navPageDict, state)
                 invalidSelectionFlag, selection = selectOption(hallList, navPageDict)
                 # for navigation menu
                 if not invalidSelectionFlag:
@@ -212,43 +226,108 @@ def ownerController(userObj):
                     print('Invalid selection, Please input again')
 
         while state == 4:
-            #hallID = input("Enter Hall ID: ")
             index = int(selection)
             hallDetails = Hall.viewHallDetails(index)
-            # print(hallDetails)
-            # print(type(hallDetails))
-            # time.sleep(2)
-            #displayPage('Hall Details', userObj.getFirstName(), hallDetails, navPageDict)
-            # tableHeader = ("{0:^10}{1:^10}{2:^10}{3:^10}".format('Venue', 'Type', 'Addr', 'Capacity'))
-            # print("{}".format(tableHeader))
-            # print("{0:^10}{1:^10}{2:^10}{3:^10}".format(hallDetails[0], hallDetails[2], hallDetails[3], hallDetails[4]))
-            #print('{:^65}'.format(displayFormat))
             navPageDict = {'M': 'Modify Hall', 'D': 'Delete Hall','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
             #placeholder dictionary
             bookHallPage = dict()
-            # print
-            # tempString = '{}\n Venue - {} Type - {} Addr - {} Capacity - {}'.format(userObj.getFirstName(), hallDetails[0], hallDetails[2], hallDetails[3], hallDetails[4])
-            displayPage('Hall Details', userObj.getFirstName(), hallDetails, navPageDict)
+            displayPage('Hall Details', userObj.getFirstName(), hallDetails, navPageDict, state)
             invalidSelectionFlag, selection = selectOption(bookHallPage, navPageDict)
             if not invalidSelectionFlag:
                 if selection in navPageDict:
                     if selection == 'M':
                         hallExistFlag, hallModify = acceptModifyHallDetails(userObj, hallDetails)
                         # create a user object
-                        if hallExistFlag:
-                            state = 3
-                        else:
+                        if not hallExistFlag:
                             hallModify['Modify'] = True
-                            hallObj = Hall(hallModify)
-                            hallObj.modifyhall(hallDetails[0], hallModify)
-                            state = 3
+                            confirmation = input('Confirm Modification Request(Y/N): ')
+                            if confirmation.isalpha():
+                                if confirmation.lower() == 'y':
+                                    #create object of quotations
+                                    hallObj = Hall(hallModify)
+                                    hallObj.modifyhall(hallDetails[0], hallModify)
+                                elif confirmation.lower() == 'n':
+                                    print('Taking back to previous menu')
+                                    time.sleep(1)
                         state = 3
                     elif selection == 'D':
                         hallDelete = dict()
                         hallDelete['requested'] = True
-                        hallObj = Hall(hallDelete)
-                        hallObj.deletehall(hallDetails[0])
+                        confirmation = input('Confirm Delete Request(Y/N): ')
+                        if confirmation.isalpha():
+                            if confirmation.lower() == 'y':
+                                #create object of quotations
+                                hallObj = Hall(hallDelete)
+                                hallObj.deletehall(hallDetails[0])
+                            elif confirmation.lower() == 'n':
+                                print('Taking back to previous menu')
+                                time.sleep(1)
                         state = 3
+                    else:
+                        state = navOptions(selection, state)
+            else:
+                print('Invalid selection, Please input again')
+
+        while state == 5:
+            quotationList = Quotation.listOwnerQuotationRequests(userObj.getRowId())
+            navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
+            displayPage('Requested Quotations Page', userObj.getFirstName(), quotationList, navPageDict, state)
+            invalidSelectionFlag, selection = selectOption(quotationList, navPageDict)
+            if not invalidSelectionFlag:
+                if selection == 'B':
+                    state = 2
+                elif selection in navPageDict:
+                    state = navOptions(selection, state)
+                else:
+                    # take to next state to display hall listing
+                    state = 6
+            else:
+                print('Invalid selection, Please input again')
+
+        while state == 6:
+            index = int(selection)
+            quotationDetails = Quotation.viewQuotationDetails(index)
+            if(quotationDetails[5] == 'Pending'):
+                navPageDict = {'A': 'Accept', 'M':'Modify','R': 'Reject','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+            else:
+                navPageDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+            displayPage('Quotation Details', userObj.getFirstName(), quotationDetails, navPageDict, state)
+            #placeholder dictionary
+            QuotationPage = dict()
+            invalidSelectionFlag, selection = selectOption(QuotationPage, navPageDict)
+            if not invalidSelectionFlag:
+                if selection in navPageDict:
+                    if selection == 'M':
+                        newAmount = input('Enter New Quotation Amount: ')
+                        confirmation = input('Confirm Modification Request(Y/N): ')
+                        if confirmation.isalpha():
+                            if confirmation.lower() == 'y':
+                                #create object of quotations
+                                Quotation.changeAmount(quotationDetails[0], newAmount)
+                            elif confirmation.lower() == 'n':
+                                print('Taking back to previous menu')
+                                time.sleep(1)
+                            state = 5
+                    elif selection == 'A':
+                        confirmation = input('Confirm Accept Request(Y/N): ')
+                        if confirmation.isalpha():
+                            if confirmation.lower() == 'y':
+                                #create object of quotations
+                                Quotation.changeStatus(quotationDetails[0], 'Approved')
+                            elif confirmation.lower() == 'n':
+                                print('Taking back to previous menu')
+                                time.sleep(1)
+                            state = 5
+                    elif selection == 'R':
+                        confirmation = input('Confirm Reject Request(Y/N): ')
+                        if confirmation.isalpha():
+                            if confirmation.lower() == 'y':
+                                #create object of quotations
+                                Quotation.changeStatus(quotationDetails[0], 'Rejected')
+                            elif confirmation.lower() == 'n':
+                                print('Taking back to previous menu')
+                                time.sleep(1)
+                            state = 5
                     else:
                         state = navOptions(selection, state)
             else:

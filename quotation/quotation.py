@@ -81,7 +81,7 @@ class Quotation:
             self.reqDate = quoDict['reqDate']
             self.hallId = quoDict['hallId']
             self.customerId = quoDict['customerId']
-            self.status = False
+            self.status = 'Pending'
             self.quotationAmount = quoDict['quotationAmount']
             self.bookingStartDate = quoDict['bookingStartDate']
             self.bookingEndDate = quoDict['bookingEndDate']
@@ -132,7 +132,8 @@ class Quotation:
         conn.close()
         return results
 
-    def changeStatus(self, status):
+    @classmethod
+    def changeStatus(self, rowId, status):
         self.status = status
         """Only first name, last name and password can be modified"""
         conn = sqlite3.connect(Quotation.dbFileName)
@@ -140,8 +141,44 @@ class Quotation:
         try:
             with conn:
                 c.execute(
-                    """UPDATE quotations SET status = :status WHERE quotationID = :quotationId""",
-                    {'status': self.status, 'quotationId': self.rowid})
+                    """UPDATE quotations SET status = :status WHERE rowid = :quotationId""",
+                    {'status': status, 'quotationId': rowId})
+        except sqlite3.Error as sqlite3Error:
+            print("SQLite3 Error -->", sqlite3Error)
+        finally:
+            conn.close()
+
+    @classmethod
+    def listOwnerQuotationRequests(cls, ownerId):
+        conn = sqlite3.connect(cls.dbFileName)
+        c = conn.cursor()
+        c.execute("SELECT rowid, bookingStartDate, bookingEndDate, hallId, customerId, status, quotationAmount FROM quotations WHERE hallId IN" +
+                    "(SELECT rowid from halls WHERE ownerId = :ownerId)", {'ownerId': ownerId,})
+        results = c.fetchall()
+        conn.close()
+        return results
+
+    @classmethod
+    def viewQuotationDetails(cls,rowId):
+        conn = sqlite3.connect(Quotation.dbFileName)
+        c = conn.cursor()
+        c.execute("""SELECT rowid, bookingStartDate, bookingEndDate, hallId, customerId, status, quotationAmount FROM quotations WHERE rowid = :rowId""",{'rowId' : rowId, })
+        output = c.fetchone()
+        #print(output)
+        #print(type(output))
+        conn.close()
+        return output
+
+    @classmethod
+    def changeAmount(self, rowId, amount):
+        """Only first name, last name and password can be modified"""
+        conn = sqlite3.connect(Quotation.dbFileName)
+        c = conn.cursor()
+        try:
+            with conn:
+                c.execute(
+                    """UPDATE quotations SET quotationAmount = :amount WHERE rowid = :quotationId""",
+                    {'amount': amount, 'quotationId': rowId})
         except sqlite3.Error as sqlite3Error:
             print("SQLite3 Error -->", sqlite3Error)
         finally:

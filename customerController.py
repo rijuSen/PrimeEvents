@@ -87,7 +87,7 @@ def selectOption(optionDisplay, pageNavDict):
         print('Your selection: {}'.format(optionDisplay.get(selection)))
         return False, selection
     elif isinstance(optionDisplay, list) and selection.isdigit() and int(selection) <= len(optionDisplay):
-        print('Your selection: {}'.format(optionDisplay[int(selection)]))
+        print('Your selection: {}'.format(optionDisplay[int(selection) - 1]))
         return False, selection
     elif selection in pageNavDict.keys():
         print('Your selection: {}'.format(pageNavDict.get(selection)))
@@ -274,6 +274,7 @@ def customerController(userObj):
                     elif confirmation.lower() == 'n':
                         print('Taking back to previous menu')
                         state = navOptions('B', state)
+                        customerConfirmCounter = 0
                     else:
                         print('Invalid input!! Try again')
                         customerConfirmCounter = customerConfirmCounter - 1
