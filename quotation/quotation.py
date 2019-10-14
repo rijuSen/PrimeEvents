@@ -65,7 +65,7 @@ class Quotation:
 #                   FOREIGN KEY(hallId) REFERENCES halls(rowid));
 
     def getQuotationEntry(self):
-        conn = sqlite3.connect(cls.dbFileName)
+        conn = sqlite3.connect(Quotation.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid, reqDate, bookingStartDate, bookingEndDate, hallId, customerId, status, quotationAmount FROM quotations WHERE rowid = :rowId",
             {'rowId': self.rowId,})
@@ -92,7 +92,7 @@ class Quotation:
         elif len(quoDict) == 1:
             # input('second if statement')
             self.rowId = quoDict['quotationId']
-            row = getQuotationEntry()
+            row = self.getQuotationEntry()
             # print('Row is of type', type(row))
             self.reqDate = row[1]
             self.hallId = row[4]
@@ -102,7 +102,8 @@ class Quotation:
             self.bookingStartDate = row[2]
             self.bookingEndDate = row[3]
 
-
+    def getRowId(self):
+        return self.rowId
 
     def getReqDate(self):
         return self.reqDate

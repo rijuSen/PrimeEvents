@@ -36,7 +36,7 @@ class Hall:
             conn.close()
 
 
-        
+
     def __init__(self,hallInfo):
         if len(hallInfo) == 6:
             self.hallName = hallInfo['hallName']
@@ -93,11 +93,14 @@ class Hall:
     def getHallType(self):
         return self.hallType
 
-    def getHallAddrs():
+    def getHallAddrs(self):
         return self.hallAddr
 
-    def getHallCapacity():
-        return hallCapacity
+    def getHallCapacity(self):
+        return self.hallCapacity
+
+    def getDayTariff(self):
+        return self.dayTariff
 
 
     @classmethod

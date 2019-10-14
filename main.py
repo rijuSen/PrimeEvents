@@ -162,12 +162,21 @@ def main():
     while state > 0:
         # state 1 represent login action
         while state == 1:
+            pageName = 'Login Page'
+            # userName = userName
+            optionDisplay = {'L': 'Login', 'O': 'Register as Owner', 'C': 'Register as Customer'}
+            pageNavDict = {'E': 'Exit'}
+            # message = message
+            # state = state
+            # headerDisplay = headerDisplay
             os.system('clear')
-            landingPage = {'L': 'Login', 'O': 'Register as Owner', 'C': 'Register as Customer'}
-            navPageDict = {'E': 'Exit'}
-            userNamePlaceHolder = ''
-            displayPage('Login Page', userNamePlaceHolder, landingPage, navPageDict)
-            invalidSelectionFlag, selection = selectOption(landingPage, navPageDict)
+            # landingPage = {'L': 'Login', 'O': 'Register as Owner', 'C': 'Register as Customer'}
+            # navPageDict = {'E': 'Exit'}
+            # userNamePlaceHolder = ''
+            displayDict = {'pageName': pageName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict}
+            displayPage(displayDict)
+            # displayPage('Login Page', userNamePlaceHolder, landingPage, pageNavDict)
+            invalidSelectionFlag, selection = selectOption(optionDisplay, pageNavDict)
             if not invalidSelectionFlag:
                 if selection == 'O':
                     mailExistFlag, userInfo = acceptUserDetails()
