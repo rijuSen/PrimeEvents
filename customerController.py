@@ -3,6 +3,8 @@ import time
 import datetime
 from hall.hall import Hall
 from quotation.quotation import Quotation
+from booking.booking import Booking
+
 
 def displayPage(inputDict):
     """if userName exists then will be displayed on selectOption
@@ -357,16 +359,16 @@ def customerController(userObj):
                         state = navOptions(selection, state)
                 else:
                     quotationObj = Quotation({'quotationId': selection})
-                    if quotationObj.getStatus() == 'Accepted':
+                    if quotationObj.getStatus() == 'Approved':
                         state = 8
                         break
                     elif quotationObj.getStatus() == 'Pending':
-                        print('Quotation ID {} is pending at Owner'.format(quotationObj.getRowId()))
+                        print('Quotation ID {} is pending at Owner'.format(quotationObj.getQuotationId()))
                         time.sleep(2)
                         state = 7
                         break
                     else:
-                        print('Quotation ID {} is rejected by Owner'.format(quotationObj.getRowId()))
+                        print('Quotation ID {} is rejected by Owner'.format(quotationObj.getQuotationId()))
                         time.sleep(2)
                         state = 7
                         break
@@ -375,10 +377,18 @@ def customerController(userObj):
                 time.sleep(2)
 
         while state == 8:
-            Quotation.changeStatus(selection,'Completed')
+            """bookingInfo['bookingStartDate','bookingEndDate','hallId','customerId','bookingAmount','quotationId']"""
+            bookingInfo = {'bookingStartDate': quotationObj.getBookingStartDate(),'bookingEndDate': quotationObj.getBookingEndDate(),'hallId': quotationObj.getHallId(), 'customerId': quotationObj.getCustomerId(),'bookingAmount': quotationObj.getQuotationAmount(),'quotationId': quotationObj.getQuotationId()}
+            bookingObj = Booking(bookingInfo)
+            row = bookingObj.getBookingDetails()
+            print(row)
+            input('Press enter to make payment')
+            bookingObj.completeBooking()
+            row = bookingObj.getBookingDetails()
+            print(row)
             print('Yay! Booked')
-            time.sleep(2)
-            state = 7
+            time.sleep(5)
+            state = 2
 
 
     return state

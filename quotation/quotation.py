@@ -102,8 +102,14 @@ class Quotation:
             self.bookingStartDate = row[2]
             self.bookingEndDate = row[3]
 
-    def getRowId(self):
-        return self.rowId
+    def getQuotationAmount(self):
+        return self.quotationAmount
+
+    def  getBookingStartDate(self):
+        return self.bookingStartDate
+
+    def getBookingEndDate(self):
+        return self.bookingEndDate
 
     def getReqDate(self):
         return self.reqDate
@@ -118,7 +124,7 @@ class Quotation:
         return self.status
 
     def getQuotationId(self):
-        return self.rowid
+        return self.rowId
 
     def getQuotationAmount(self):
         return self.quotationAmount

@@ -38,6 +38,14 @@ class Booking:
             conn.close()
 
 
+    def getBookingDetails(self):
+        conn = sqlite3.connect(Booking.dbFileName)
+        c = conn.cursor()
+        c.execute("""SELECT rowid, * FROM bookings WHERE rowid = :rowId""",{'rowId' : self.rowId, })
+        output = c.fetchone()
+        conn.close()
+        return output
+
     def __init__(self,bookingInfo):
         """bookingInfo['bookingStartDate','bookingEndDate','hallId','customerId','bookingAmount','quotationId']"""
         if len(bookingInfo) == 6:
@@ -45,12 +53,33 @@ class Booking:
             self.bookingEndDate = bookingInfo['bookingEndDate']
             self.hallId = bookingInfo['hallId']
             self.customerId = bookingInfo['customerId']
-            self.status = False
+            self.status = 'Pending'
             self.bookingAmount = bookingInfo['bookingAmount']
             self.quotationId = bookingInfo['quotationId']
             self.insertIntoBookingDb()
-        elif len(bookingInfo) == 2:
-            pass
+        elif len(bookingInfo) == 1:
+            self.rowId = bookingInfo['bookingId']
+            row = getBookingDetails()
+            self.bookingStartDate = row[1]
+            self.bookingEndDate = row[2]
+            self.hallId = row[3]
+            self.customerId = row[4]
+            self.status = row[5]
+            self.bookingAmount = row[6]
+            self.quotationId = row[7]
+
+
+    def completeBooking(self):
+        self.status = 'Completed'
+        conn = sqlite3.connect(Booking.dbFileName)
+        c = conn.cursor()
+        try:
+            with conn:
+                c.execute("""UPDATE Bookings SET status = :status WHERE rowid = :rowId""",{'status': self.status, 'rowId': self.rowId})
+        except sqlite3.Error as sqlite3Error:
+            print("SQLite3 Error -->",sqlite3Error)
+        finally:
+            conn.close()
 
     @classmethod
     def editBooking(cls,editBookingOfbookingEndDate,editbookingStartDate,bookingStartDate,customerId,status,bookingAmount):
@@ -65,7 +94,17 @@ class Booking:
         finally:
             conn.close()
 
-
+    def completeBooking(self):
+        self.status = 'Completed'
+        conn = sqlite3.connect(Booking.dbFileName)
+        c = conn.cursor()
+        try:
+            with conn:
+                c.execute("""UPDATE Bookings SET status = :status WHERE rowid = :rowId""",{'status': self.status, 'rowId': self.rowId})
+        except sqlite3.Error as sqlite3Error:
+            print("SQLite3 Error -->",sqlite3Error)
+        finally:
+            conn.close()
 
     def getBookingStartDate(self):
         return self.bookingStartDate
@@ -76,11 +115,11 @@ class Booking:
     def getCustomerId(self):
         return self.customerId
 
-    def getStatus():
+    def getStatus(self):
         return self.status
 
-    def getBookingAmount():
-        return bookingAmount
+    def getBookingAmount(self):
+        return self.bookingAmount
 
 
     @classmethod
