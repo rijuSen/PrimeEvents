@@ -7,74 +7,112 @@ from cryptography.hazmat.primitives import hashes
 
 from user.user import *
 
-from customerController import *
+from customerController import CustomerController
 from ownerController import ownerController
 
-
-def navOptions(selection, state):
-    if selection == 'O':
-        state = 1
-    elif selection == 'B':
-        state = state - 1
-    elif selection == 'E':
-        state = 0
-    return state
-
-
-# def displayPage(pageName, userName, optionDisplay, pageNavDict):
+def displayPage(inputDict):
+    """if userName exists then will be displayed on selectOption
+    if optionDisplay exists then display
+        if optionDisplay is a dict display as dict
+        if optionDisplay is a list display as list
+        {'pageName':, 'userName': , 'optionDisplay':, 'pageNavDict': , 'footerDisplay': , 'state': , 'headerDisplay': }
+    pageName = inputDict['pageName']
+    userName = inputDict['userName']
+    optionDisplay = inputDict['optionDisplay']
+    pageNavDict = inputDict['pageNavDict']
+    footerDisplay = inputDict['footerDisplay']
+    state = inputDict['state']
+    headerDisplay = inputDict['headerDisplay']
+    {'pageName': pageName = None, 'userName': userName = None, 'optionDisplay': optionDisplay = None, 'pageNavDict': pageNavDict = None, 'state': state}"""
     os.system('clear')
     # Display Page Name
-    print('-' * 45)
-    print('{0:^45}'.format(pageName))
-    print('-' * 45)
+    print('-' * 105)
+    print('{0:^105}'.format(inputDict['pageName']))
+    print('-' * 105)
     # Display User Name
-    if not len(userName) == 0:
-        print('{0:^45}'.format('Logged in as ' + userName.capitalize()))
-        print('-' * 45)
-    if not len(optionDisplay) == 0:
-        if isinstance(optionDisplay, dict):
+    if 'userName' in inputDict.keys():
+        print('{0:^105}'.format('Logged in as ' + inputDict['userName'].capitalize()))
+        print('-' * 105)
+    if 'headerDisplay' in inputDict.keys():
+        print('{:^105}'.format(inputDict['headerDisplay']))
+        print('-' * 105)
+    if 'optionDisplay' in inputDict.keys():
+        if isinstance(inputDict['optionDisplay'], dict):
             # Menu Options format
-            print('{:^45}'.format('Input key to select corresponding option'))
-            print('-' * 45)
-            print('{0:^10}{1:^30}'.format('[Keys]', 'Options'))
-            print('-' * 45)
+            tempString = '{0:^5}{1:^30}'.format('[Keys]', 'Options')
+            print('{:^105}'.format(tempString))
+            print('-' * 105)
             # display menu
-            for key, option in optionDisplay.items():
-                print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
-            print('-' * 45)
+            for key, option in inputDict['optionDisplay'].items():
+                tempString = '{0:^5}{1:^30}'.format('['+ key +']', option)
+                print('{:^105}'.format(tempString))
+                # print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
+            print('-' * 105)
             # navigation panel
-            print('-' * 45)
-        if isinstance(optionDisplay, list):
+        if isinstance(inputDict['optionDisplay'], list) and inputDict['state'] == 7:
+            tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('ID', 'Request Date-Time', 'Booking Start-Date', 'Booking End-Date', 'Hall ID', 'Status', 'Charge'))
+            print("{0:^105}".format(tableHeader))
+            # for value in optionDisplay:
+            for tup in inputDict['optionDisplay']:
+                tempString = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format(tup[0], tup[1], tup[2], tup[3], tup[4], tup[6], tup[7]))
+                print('{:^105}'.format(tempString))
+            print('-' * 105)
+
+        elif isinstance(inputDict['optionDisplay'], list):
+            # print("Its a list")
+            # time.sleep(2)
             # Menu Options format
-            print('Input key to select corresponding option')
-            print('-' * 45)
             # display menu
-            tableHeader = ("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format('Key', 'Venue', 'Type', 'Addr', 'Capacity'))
-            print("{0:^45}".format(tableHeader))
-            for row in optionDisplay:
-                rowWise = ("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format(row[0], row[1], row[3], row[4], row[5]))
-                print('{:^45}'.format(rowWise))
-            print('-' * 45)
+            tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format('Key', 'Venue', 'Type', 'Addr', 'Capacity'))
+            print("{0:^105}".format(tableHeader))
+            for row in inputDict['optionDisplay']:
+                rowWise = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(row[0], row[1], row[3], row[4], row[5]))
+                print('{:^105}'.format(rowWise))
+            print('-' * 105)
             # navigation panel
-            print('-' * 45)
-    if not len(pageNavDict) == 0:
+
+        if isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 5:
+            tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format('ID', 'Venue', 'Tariff/day', 'Function Type', 'Address', 'Capacity'))
+            print("{0:^105}".format(tableHeader))
+            # for value in optionDisplay:
+            tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][1], inputDict['optionDisplay'][3], inputDict['optionDisplay'][4], inputDict['optionDisplay'][5], inputDict['optionDisplay'][6]))
+            print('{:^105}'.format(tempString))
+            print('-' * 105)
+
+        if 'footerDisplay' in inputDict.keys():
+            print('{0:^105}'.format(inputDict['footerDisplay']))
+            print('-' * 105)
+            # navigation panel
+    if 'pageNavDict' in inputDict.keys():
         navBar = ''
-        for key, option in pageNavDict.items():
-            navBarTemp = '{:^11}'.format('[' + key + ']' + option)
+        for key, option in inputDict['pageNavDict'].items():
+            navBarTemp = '{:^20}'.format('[' + key + ']' + option)
             navBar = navBar + navBarTemp
-        print('{:^45}'.format(navBar))
-    print('-' * 45)
+        print('{:^105}'.format(navBar))
+        print('-' * 105)
 
-
-# def selectOption(optionDisplay, pageNavDict):
+def selectOption(optionDisplay, pageNavDict):
+    """selection made is from either dictionary keys or list indices
+    return true and null string if invalid selection made and
+    return false and selection in appropriate format if valid selection is made"""
     # prompt user to select option
     selection = input('Enter your selection: ')
     if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
         print('Your selection: {}'.format(optionDisplay.get(selection)))
+        # input('Break')
         return False, selection
-    elif isinstance(optionDisplay, list) and selection.isdigit() and int(selection) <= len(optionDisplay):
-        print('Your selection: {}'.format(optionDisplay[int(selection) - 1]))
-        return False, selection
+    # elif isinstance(optionDisplay, dict) and selection not in optionDisplay.keys():
+    #     print('Your selection: {}'.format(selection))
+    #     return True, ''
+    elif isinstance(optionDisplay, list) and selection.isdigit():
+        for row in optionDisplay:
+            if row[0] == int(selection):
+                print('Your selection: {}'.format(selection))
+                return False, int(selection)
+        else:
+            print('Selection {} is not a valid. Kindly provide a valid selection'.format(selection))
+            time.sleep(2)
+            return True, ''
     elif selection in pageNavDict.keys():
         print('Your selection: {}'.format(pageNavDict.get(selection)))
         return False, selection
@@ -83,6 +121,17 @@ def navOptions(selection, state):
         time.sleep(2)
         return True, ''
 
+def navOptions(selection, state):
+    """
+
+    :param selection:
+    :type state: object
+    """
+    if selection == 'O':
+        state = 1
+    elif selection == 'E':
+        state = 0
+    return state
 
 def getPass():
     # check password length more than or equal to 8
@@ -102,7 +151,6 @@ def getPass():
     digest.update(bytes(passPlain, 'utf-8'))
     passHash = digest.finalize()
     return passHash
-
 
 def acceptUserDetails():
     os.system('clear')
@@ -127,7 +175,6 @@ def acceptUserDetails():
             userInfo['password'] = getPass()
     return mailExistFlag, userInfo
 
-
 def userLogin():
     loginFlag = False
     retryCount = 0
@@ -149,13 +196,6 @@ def userLogin():
         else:
             success = True
     return {'success': success, 'userObj': userObj}
-
-
-def displayTableFormat(listData, startIndex):
-    print("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format('ID', 'Hall-Name', 'Hall-Type', 'Hall-Addr', 'Hall-Capacity'))
-    for row in listData[startIndex:startIndex + 4:1]:
-        print("{0:^5}{1:^10}{2:^10}{3:^10}{4:^10}".format(row[0], row[1], row[3], row[4], row[5]))
-
 
 def main():
     state = 1
@@ -223,7 +263,8 @@ def main():
                                                                             userObj.getUserType()))
         # call respective controller to deal with further action
         while state == 2 and userObj.getUserType() == 'Customer':
-            state = customerController(userObj)
+            customerController = CustomerController(userObj)
+            state = customerController.getState()
         while state == 2 and userObj.getUserType() == 'Owner':
             state = ownerController(userObj)
         print(state)
