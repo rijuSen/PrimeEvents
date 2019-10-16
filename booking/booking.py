@@ -30,6 +30,8 @@ class Booking:
             #save the rowid of the inserted row in the variable rowId
             for id in c.fetchone():
                 self.rowId = id
+                # strDebug = '{}{}'.format('Booking row inserted and rowId is ',id)
+                # input(strDebug)
             self.success = True
         except sqlite3.Error as sqlite3Error:
             self.success = False
@@ -41,7 +43,7 @@ class Booking:
     def getBookingDetails(self):
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
-        c.execute("""SELECT rowid, * FROM bookings WHERE rowid = :rowId""",{'rowId' : self.rowId, })
+        c.execute("""SELECT rowid, * FROM bookings WHERE quotationId = :quotationId""",{'quotationId' : self.quotationId, })
         output = c.fetchone()
         conn.close()
         return output
@@ -53,7 +55,7 @@ class Booking:
             self.bookingEndDate = bookingInfo['bookingEndDate']
             self.hallId = bookingInfo['hallId']
             self.customerId = bookingInfo['customerId']
-            self.status = 'Pending'
+            self.status = 'Completed'
             self.bookingAmount = bookingInfo['bookingAmount']
             self.quotationId = bookingInfo['quotationId']
             self.insertIntoBookingDb()
@@ -106,6 +108,10 @@ class Booking:
         finally:
             conn.close()
 
+    def getRowId(self):
+        return self.rowId
+
+
     def getBookingStartDate(self):
         return self.bookingStartDate
 
@@ -137,9 +143,8 @@ class Booking:
     def viewUserBookings(cls, userObj):
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
-        bookingEndDate = userObj.getRowId()
-        c.execute("SELECT rowid,* from Bookings WHERE bookingEndDate = :bookingEndDate",{'bookingEndDate': bookingEndDate,})
-        output = c.fetcBooking()
+        c.execute("SELECT rowid,* from Bookings WHERE customerId = :customerId",{'customerId': userObj.getRowId(),})
+        output = c.fetchall()
         conn.close()
         return output
 
