@@ -1,336 +1,433 @@
 import os
 import time
+import datetime
 from hall.hall import Hall
 from quotation.quotation import Quotation
+from booking.booking import Booking
 
-def displayPage(pageName, userName, optionDisplay, pageNavDict, state = 2, message = None):
-    """if userName exists then will be displayed on selectOption
-    if optionDisplay exists then display
+class OwnerController:
+    """Owner Controller"""
+    def __init__(self, userObj):
+        self.userObj = userObj
+        self.state = 2
+        self.ownerController(self.userObj)
+
+    def getState(self):
+        return self.state
+
+    def displayPage(self, inputDict):
+        """
+        if userName exists then will be displayed on self.selectOption
+        if optionDisplay exists then display
         if optionDisplay is a dict display as dict
-        if optionDisplay is a list display as list"""
-    os.system('clear')
-    # Display Page Name
-    print('-' * 65)
-    print('{0:^65}'.format(pageName))
-    print('-' * 65)
-    # Display User Name
-    if not len(userName) == 0:
-        print('{0:^65}'.format('Logged in as ' + userName.capitalize()))
-        print('-' * 65)
-    if not len(optionDisplay) == 0:
-        if isinstance(optionDisplay, dict):
-            # Menu Options format
-            print('{:^65}'.format('Input key to select corresponding option'))
-            print('-' * 65)
-            tempString = '{0:^5}{1:^30}'.format('[Keys]', 'Options')
-            print('{:^65}'.format(tempString))
-            print('-' * 65)
-            # display menu
-            for key, option in optionDisplay.items():
-                tempString = '{0:^5}{1:^30}'.format('['+ key +']', option)
-                print('{:^65}'.format(tempString))
-                # print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
-            print('-' * 65)
-            # navigation panel
-        if isinstance(optionDisplay, list):
+        if optionDisplay is a list display as list
+        {'pageName':, 'userName': , 'optionDisplay':, 'pageNavDict': , 'footerDisplay': , 'state': , 'headerDisplay': }
+        pageName = inputDict['pageName']
+        userName = inputDict['userName']
+        optionDisplay = inputDict['optionDisplay']
+        pageNavDict = inputDict['pageNavDict']
+        footerDisplay = inputDict['footerDisplay']
+        state = inputDict['state']
+        headerDisplay = inputDict['headerDisplay']
+        {'pageName': pageName = None, 'userName': userName = None, 'optionDisplay': optionDisplay = None, 'pageNavDict': pageNavDict = None, 'state': state}
+        """
+        os.system('clear')
+        # Display Page Name
+        print('-' * 105)
+        print('{0:^105}'.format(inputDict['pageName']))
+        print('-' * 105)
+        # Display User Name
+        if 'userName' in inputDict.keys():
+            print('{0:^105}'.format('Logged in as ' + inputDict['userName'].capitalize()))
+            print('-' * 105)
+        if 'headerDisplay' in inputDict.keys():
+            print('{:^105}'.format(inputDict['headerDisplay']))
+            print('-' * 105)
+        if 'optionDisplay' in inputDict.keys():
+            if isinstance(inputDict['optionDisplay'], dict) and 'state' in inputDict.keys() and inputDict['state'] == 8:
+                tempString = '{0:^30}{1:^40}'.format('Attribute', 'Value')
+                print('{:^105}'.format(tempString))
+                for key, value in inputDict['optionDisplay'].items():
+                    tempString = '{0:^30}{1:^40}'.format(key.capitalize(), value)
+                    print('{:^105}'.format(tempString))
+                print('-' * 105)
 
-            # Menu Options format
-            print('{:^65}'.format('Input key to select corresponding option'))
-            print('-' * 65)
-            # display menu
-            if state == 3:
-                tableHeader = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format('Key', 'Venue', 'Tariff','Type', 'Addr', 'Capacity'))
-            elif state == 5:
-                tableHeader = ("{0:^5}{1:^12}{2:^12}{3:^6}{4:^10}{5:^10}{6:^10}".format('Key', 'StartDate', 'EndDate','Venue', 'Customer', 'Status','Amount'))
-            print("{0:^65}".format(tableHeader))
-            for row in optionDisplay:
-                if state == 3:
-                    rowWise = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format(row[0], row[1], row[3], row[4], row[5], row[6]))
-                elif state == 5:
-                    rowWise = ("{0:^5}{1:^12}{2:^12}{3:^6}{4:^10}{5:^10}{6:^10}".format(row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
-                print('{:^65}'.format(rowWise))
-            print('-' * 65)
-            # navigation panel
+            elif isinstance(inputDict['optionDisplay'], dict):
+                # Menu Options format
+                tempString = '{0:^5}{1:^30}'.format('[Keys]', 'Options')
+                print('{:^105}'.format(tempString))
+                print('-' * 105)
+                # display menu
+                for key, option in inputDict['optionDisplay'].items():
+                    tempString = '{0:^5}{1:^30}'.format('['+ key +']', option)
+                    print('{:^105}'.format(tempString))
+                    # print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
+                print('-' * 105)
+                # navigation panel
+            elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 5:
+                tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('Key', 'Start-Date', 'End-Date','Venue', 'Customer', 'Status','Amount'))
+                print("{0:^105}".format(tableHeader))
+                # for value in optionDisplay:
+                for tup in inputDict['optionDisplay']:
+                    tempString = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format(tup[0], tup[1], tup[2], tup[3], tup[4], tup[5], tup[6]))
+                    print('{:^105}'.format(tempString))
+                print('-' * 105)
 
-        if isinstance(optionDisplay, tuple):
-            # print("Its a list")
-            # time.sleep(2)
-            # Menu Options format
-            # print('Input key to select corresponding option')
-            # print('-' * 65)
-            # display menu
-            if state == 4:
+            elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 7:
+                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^10}{4:^10}{5:^10}".format('ID', 'Start-Date', 'End-Date', 'Hall ID', 'Customer','Amount Paid'))
+                print("{0:^105}".format(tableHeader))
+                for row in inputDict['optionDisplay']:
+                    rowWise = ("{0:^5}{1:^15}{2:^15}{3:^10}{4:^10}{5:^10}".format(row[0], row[1], row[2], row[3], row[4], row[6]))
+                    print('{:^105}'.format(rowWise))
+                print('-' * 105)
+                # navigation panel
+            elif isinstance(inputDict['optionDisplay'], list):
                 tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format('Key', 'Venue', 'Type', 'Addr', 'Capacity'))
-            elif state == 6:
-                tableHeader = ("{0:^5}{1:^12}{2:^12}{3:^6}{4:^10}{5:^10}{6:^10}".format('Key', 'StartDate', 'EndDate','Venue', 'Customer', 'Status','Amount'))
-            print("{0:^65}".format(tableHeader))
-            # tempList = str(optionDisplay).split(',')
-            # print(tempList)
-            # for value in optionDisplay:
-            if state == 4:
-                tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(optionDisplay[0], optionDisplay[1], optionDisplay[3], optionDisplay[4], optionDisplay[5]))
-            elif state == 6:
-                tempString = ("{0:^5}{1:^12}{2:^12}{3:^6}{4:^10}{5:^10}{6:^10}".format(optionDisplay[0], optionDisplay[1], optionDisplay[2], optionDisplay[3], optionDisplay[4], optionDisplay[5], optionDisplay[6]))
-            print('{:^65}'.format(tempString))
-            print('-' * 65)
-        if not message == None:
-            print('{0:^65}'.format(message))
-            print('-' * 65)
+                print("{0:^105}".format(tableHeader))
+                for row in inputDict['optionDisplay']:
+                    rowWise = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(row[0], row[1], row[3], row[4], row[5]))
+                    print('{:^105}'.format(rowWise))
+                print('-' * 105)
+                # navigation panel
+
+            elif isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 4:
+                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format('ID', 'Venue', 'Tariff/day', 'Function Type', 'Address', 'Capacity'))
+                print("{0:^105}".format(tableHeader))
+                # for value in optionDisplay:
+                tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][1], inputDict['optionDisplay'][3], inputDict['optionDisplay'][4], inputDict['optionDisplay'][5], inputDict['optionDisplay'][6]))
+                print('{:^105}'.format(tempString))
+                print('-' * 105)
+
+            elif isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 6:
+                tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('Key', 'StartDate', 'EndDate','Venue', 'Customer', 'Status','Amount'))
+                print("{0:^105}".format(tableHeader))
+                # for value in optionDisplay:
+                tempString = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][1], inputDict['optionDisplay'][2], inputDict['optionDisplay'][3], inputDict['optionDisplay'][4], inputDict['optionDisplay'][5], inputDict['optionDisplay'][6]))
+                print('{:^105}'.format(tempString))
+                print('-' * 105)
+
+        if 'footerDisplay' in inputDict.keys():
+            print('{0:^105}'.format(inputDict['footerDisplay']))
+            print('-' * 105)
             # navigation panel
-    if not len(pageNavDict) == 0:
-        navBar = ''
-        for key, option in pageNavDict.items():
-            navBarTemp = '{:^11}'.format('[' + key + ']' + option)
-            navBar = navBar + navBarTemp
-        print('{:^65}'.format(navBar))
-        print('-' * 65)
+        if 'pageNavDict' in inputDict.keys():
+            navBar = ''
+            for key, option in inputDict['pageNavDict'].items():
+                navBarTemp = '{:^15}'.format('[' + key + ']' + option)
+                navBar = navBar + navBarTemp
+            print('{:^105}'.format(navBar))
+            print('-' * 105)
 
-
-def selectOption(optionDisplay, pageNavDict):
-    """selection made is from either dictionary keys or list indices
-    return true and null string if invalid selection made and
-    return false and selection in appropriate format if valid selection is made"""
-    # prompt user to select option
-    selection = input('Enter your selection: ')
-    if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
-        print('Your selection: {}'.format(optionDisplay.get(selection)))
-        return False, selection
-    elif isinstance(optionDisplay, list) and selection.isdigit() and int(selection) <= len(optionDisplay):
-        print('Your selection: {}'.format(optionDisplay[int(selection) - 1]))
-        return False, selection
-    elif selection in pageNavDict.keys():
-        print('Your selection: {}'.format(pageNavDict.get(selection)))
-        return False, selection
-    else:
-        print('Selection {} is not a valid. Kindly provide a valid selection'.format(selection))
-        time.sleep(2)
-        return True, ''
-
-
-def navOptions(selection, state):
-    """
-
-    :param selection:
-    :type state: object
-    """
-    if selection == 'O':
-        state = 1
-    elif selection == 'B':
-        state = state - 1
-    elif selection == 'E':
-        state = 0
-    return state
-
-def acceptHallDetails(userObj):
-    os.system('clear')
-    print('=' * 65)
-    print('{:^65}'.format('New Hall Page'))
-    print('=' * 65)
-    hallInfo = dict()
-    hallExistFlag = True
-    retryCount = 0
-    while hallExistFlag and retryCount < 3:
-        hallInfo['hallName'] = input('Enter Hall Name: ')
-        hallExistFlag = Hall.hallExists(hallInfo['hallName'], userObj)
-        retryCount = retryCount + 1
-        if hallExistFlag == True and retryCount < 3:
-            print("Hall already exists, try another Hall name")
-        elif hallExistFlag == True and retryCount == 3:
-            print('Maximum attemps reached, taking back to Manage Halls page')
-            time.sleep(2)
-        else:
-            hallInfo['dayTariff'] = input('Enter Hall Per Day Tariff: ')
-            hallInfo['hallType'] = input('Enter Hall Type: ')
-            hallInfo['hallAddr'] = input('Enter Hall Addr: ')
-            hallInfo['hallCapacity'] = input('Enter Hall Capacity: ')
-            hallInfo['ownerId'] = userObj.getRowId()
-    return hallExistFlag, hallInfo
-
-def acceptModifyHallDetails(userObj, optionDisplay):
-    os.system('clear')
-    print('=' * 65)
-    print('{:^65}'.format('Modify Hall Page'))
-    print('=' * 65)
-    tableHeader = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format('Key', 'Venue', 'Tariff','Type', 'Addr', 'Capacity'))
-    print("{0:^65}".format(tableHeader))
-    tempString = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format(optionDisplay[0], optionDisplay[1], optionDisplay[3], optionDisplay[4], optionDisplay[5], optionDisplay[6]))
-    print('{:^65}'.format(tempString))
-    print('-' * 65)
-    hallInfo = dict()
-    hallExistFlag = True
-    retryCount = 0
-    while hallExistFlag and retryCount < 3:
-        hallInfo['hallName'] = input('Enter new Hall Name: ')
-        hallExistFlag = Hall.hallExists(hallInfo['hallName'], userObj)
-        retryCount = retryCount + 1
-        if hallExistFlag == True and retryCount < 3:
-            print("Hall already exists, try another Hall name")
-        elif hallExistFlag == True and retryCount == 3:
-            print('Maximum attemps reached, taking back to Manage Halls page')
-            time.sleep(2)
-        else:
-            hallInfo['dayTariff'] = input('Enter new Hall Per Day Tariff: ')
-            hallInfo['hallType'] = input('Enter new Hall Type: ')
-            hallInfo['hallAddr'] = input('Enter new Hall Addr: ')
-            hallInfo['hallCapacity'] = input('Enter new Hall Capacity: ')
-            hallInfo['ownerId'] = userObj.getRowId()
-    return hallExistFlag, hallInfo
-
-
-def ownerController(userObj):
-    """ This method contains all functionalities related to owner"""
-    state = 2
-    while state >= 2:
-        while state == 2:
-            ownerPage = {'1': 'Manage Halls', '2': 'View Quotation Request', '3': 'Manage Bookings', '4': 'Manage Payments'}
-            navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
-            displayPage('Owner Page', userObj.getFirstName(), ownerPage, navPageDict, state)
-            invalidSelectionFlag, selection = selectOption(ownerPage, navPageDict)
-            # for navigation menu
-            if not invalidSelectionFlag:
-                if selection in navPageDict:
-                    state = navOptions(selection, state)
-                elif selection == '1':
-                    # take to next state to display hall listing
-                    state = 3
-                elif selection == '2':
-                    state = 5
-                elif selection == '3':
-                    state = 6
-                elif selection == '4':
-                    state = 7
+    def selectOption(self, optionDisplay, pageNavDict):
+        """
+        selection made is from either dictionary keys or list indices
+        return true and null string if invalid selection made and
+        return false and selection in appropriate format if valid selection is made
+        """
+        # prompt user to select option
+        selection = input('Enter your selection: ')
+        if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
+            print('Your selection: {}'.format(optionDisplay.get(selection)))
+            return False, selection
+        # elif isinstance(optionDisplay, dict) and selection not in optionDisplay.keys():
+        #     print('Your selection: {}'.format(selection))
+        #     return True, ''
+        elif isinstance(optionDisplay, list) and selection.isdigit():
+            for row in optionDisplay:
+                if row[0] == int(selection):
+                    print('Your selection: {}'.format(selection))
+                    return False, int(selection)
             else:
-                print('Invalid selection, Please input again')
+                print('Selection {} is not a valid. Kindly provide a valid selection'.format(selection))
+                time.sleep(2)
+                return True, ''
+        elif selection in pageNavDict.keys():
+            print('Your selection: {}'.format(pageNavDict.get(selection)))
+            return False, selection
+        else:
+            print('Selection {} is not a valid. Kindly provide a valid selection'.format(selection))
+            time.sleep(2)
+            return True, ''
 
-        while state == 3:
-                hallList = Hall.viewUserHalls(userObj)
-                navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back', 'A': 'Add New Hall'}
-                displayPage('Manage Hall Page', userObj.getFirstName(), hallList, navPageDict, state)
-                invalidSelectionFlag, selection = selectOption(hallList, navPageDict)
+    def navOptions(self, selection, state):
+        """
+
+        :param selection:
+        :type state: object
+        """
+        if selection == 'O':
+            state = 1
+        elif selection == 'E':
+            state = 0
+        return state
+
+    def acceptHallDetails(self, userObj):
+        os.system('clear')
+        print('=' * 65)
+        print('{:^65}'.format('New Hall Page'))
+        print('=' * 65)
+        hallInfo = dict()
+        hallExistFlag = True
+        retryCount = 0
+        while hallExistFlag and retryCount < 3:
+            hallInfo['hallName'] = input('Enter Hall Name: ')
+            hallExistFlag = Hall.hallExists(hallInfo['hallName'], userObj)
+            retryCount = retryCount + 1
+            if hallExistFlag == True and retryCount < 3:
+                print("Hall already exists, try another Hall name")
+            elif hallExistFlag == True and retryCount == 3:
+                print('Maximum attemps reached, taking back to Manage Halls page')
+                time.sleep(2)
+            else:
+                hallInfo['dayTariff'] = input('Enter Hall Per Day Tariff: ')
+                hallInfo['hallType'] = input('Enter Hall Type: ')
+                hallInfo['hallAddr'] = input('Enter Hall Addr: ')
+                hallInfo['hallCapacity'] = input('Enter Hall Capacity: ')
+                hallInfo['ownerId'] = userObj.getRowId()
+        return hallExistFlag, hallInfo
+
+    def acceptModifyHallDetails(self, userObj, optionDisplay):
+        os.system('clear')
+        print('=' * 65)
+        print('{:^65}'.format('Modify Hall Page'))
+        print('=' * 65)
+        tableHeader = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format('Key', 'Venue', 'Tariff','Type', 'Addr', 'Capacity'))
+        print("{0:^65}".format(tableHeader))
+        tempString = ("{0:^5}{1:^15}{2:^10}{3:^10}{4:^15}{5:^10}".format(optionDisplay[0], optionDisplay[1], optionDisplay[3], optionDisplay[4], optionDisplay[5], optionDisplay[6]))
+        print('{:^65}'.format(tempString))
+        print('-' * 65)
+        hallInfo = dict()
+        hallExistFlag = True
+        retryCount = 0
+        while hallExistFlag and retryCount < 3:
+            hallInfo['hallName'] = input('Enter new Hall Name: ')
+            hallExistFlag = Hall.hallExists(hallInfo['hallName'], userObj)
+            retryCount = retryCount + 1
+            if hallExistFlag == True and retryCount < 3:
+                print("Hall already exists, try another Hall name")
+            elif hallExistFlag == True and retryCount == 3:
+                print('Maximum attemps reached, taking back to Manage Halls page')
+                time.sleep(2)
+            else:
+                hallInfo['dayTariff'] = input('Enter new Hall Per Day Tariff: ')
+                hallInfo['hallType'] = input('Enter new Hall Type: ')
+                hallInfo['hallAddr'] = input('Enter new Hall Addr: ')
+                hallInfo['hallCapacity'] = input('Enter new Hall Capacity: ')
+                hallInfo['ownerId'] = userObj.getRowId()
+        return hallExistFlag, hallInfo
+
+    def ownerController(self, userObj):
+        """
+        This method contains all functionalities related to owner
+        """
+        state = 2
+        while state >= 2:
+            while state == 2:
+                pageName = 'Owner Home Screen'
+                userName = userObj.getFirstName()
+                optionDisplay = {'1': 'Manage Halls', '2': 'View Quotation Request', '3': 'Manage Bookings', '4': 'Manage Payments'}
+                pageNavDict = {'O': 'Logout', 'E': 'Exit'}
+                headerDisplay = 'Input key to select corresponding option'
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay}
+                self.displayPage(displayDict)
+                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
                 # for navigation menu
                 if not invalidSelectionFlag:
-                    if selection == 'A':
-                        hallExistFlag, hallInfo = acceptHallDetails(userObj)
-                        # create a user object
-                        if hallExistFlag:
-                            state = 3
-                        else:
-                            hallObj = Hall(hallInfo)
-                            state = 3
-                    elif selection in navPageDict:
-                        state = navOptions(selection, state)
-                    else:
+                    if selection in pageNavDict:
+                        state = self.navOptions(selection, state)
+                    elif selection == '1':
                         # take to next state to display hall listing
-                        state = 4
+                        state = 3
+                    elif selection == '2':
+                        state = 5
+                    elif selection == '3':
+                        state = 7
+                    elif selection == '4':
+                        state = 8
                 else:
                     print('Invalid selection, Please input again')
 
-        while state == 4:
-            index = int(selection)
-            hallDetails = Hall.viewHallDetails(index)
-            navPageDict = {'M': 'Modify Hall', 'D': 'Delete Hall','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-            #placeholder dictionary
-            bookHallPage = dict()
-            displayPage('Hall Details', userObj.getFirstName(), hallDetails, navPageDict, state)
-            invalidSelectionFlag, selection = selectOption(bookHallPage, navPageDict)
-            if not invalidSelectionFlag:
-                if selection in navPageDict:
-                    if selection == 'M':
-                        hallExistFlag, hallModify = acceptModifyHallDetails(userObj, hallDetails)
-                        # create a user object
-                        if not hallExistFlag:
-                            hallModify['Modify'] = True
+            while state == 3:
+                    optionDisplay = Hall.viewUserHalls(userObj)
+                    pageName = 'Manage Hall Page'
+                    userName = userObj.getFirstName()
+                    pageNavDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back', 'A': 'Add New Hall'}
+                    headerDisplay = 'Input key to select corresponding option'
+                    displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay}
+                    self.displayPage(displayDict)
+                    invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
+                    # for navigation menu
+                    if not invalidSelectionFlag:
+                        if selection in pageNavDict:
+                            if selection == 'A':
+                                hallExistFlag, hallInfo = self.acceptHallDetails(userObj)
+                                # create a user object
+                                if hallExistFlag:
+                                    state = 3
+                                else:
+                                    confirmation = input('Confirm Addition Request(Y/N): ')
+                                    if confirmation.isalpha():
+                                        if confirmation.lower() == 'y':
+                                            #create object of quotations
+                                            hallObj = Hall(hallInfo)
+                                        elif confirmation.lower() == 'n':
+                                            print('Taking back to previous menu')
+                                            time.sleep(1)
+                                    state = 3
+                            if selection == 'B':
+                                state = 2
+                            state = self.navOptions(selection, state)
+                        else:
+                            # take to next state to display hall listing
+                            state = 4
+                    else:
+                        print('Invalid selection, Please input again')
+
+            while state == 4:
+                index = int(selection)
+                optionDisplay = Hall.viewHallDetails(index)
+                pageName = 'Hall Detail Page'
+                userName = userObj.getFirstName()
+                pageNavDict = {'M': 'Modify Hall', 'D': 'Delete Hall','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                headerDisplay = 'Input key to select corresponding option'
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
+                self.displayPage(displayDict)
+                #placeholder dictionary
+                bookHallPage = dict()
+                #displayPage('Hall Details', userObj.getFirstName(), hallDetails, navPageDict, state)
+                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
+                if not invalidSelectionFlag:
+                    if selection in pageNavDict:
+                        if selection == 'B':
+                            state = 3
+                        if selection == 'M':
+                            hallExistFlag, hallModify = self.acceptModifyHallDetails(userObj, optionDisplay)
+                            # create a user object
+                            if not hallExistFlag:
+                                hallModify['Modify'] = True
+                                confirmation = input('Confirm Modification Request(Y/N): ')
+                                if confirmation.isalpha():
+                                    if confirmation.lower() == 'y':
+                                        #create object of quotations
+                                        hallObj = Hall(hallModify)
+                                        hallObj.modifyhall(optionDisplay[0], hallModify)
+                                    elif confirmation.lower() == 'n':
+                                        print('Taking back to previous menu')
+                                        time.sleep(1)
+                            state = 3
+                        elif selection == 'D':
+                            hallDelete = dict()
+                            hallDelete['requested'] = True
+                            confirmation = input('Confirm Delete Request(Y/N): ')
+                            if confirmation.isalpha():
+                                if confirmation.lower() == 'y':
+                                    #create object of quotations
+                                    hallObj = Hall(hallDelete)
+                                    hallObj.deletehall(optionDisplay[0])
+                                elif confirmation.lower() == 'n':
+                                    print('Taking back to previous menu')
+                                    time.sleep(1)
+                            state = 3
+                        else:
+                            state = self.navOptions(selection, state)
+                else:
+                    print('Invalid selection, Please input again')
+
+            while state == 5:
+                optionDisplay = Quotation.listOwnerQuotationRequests(userObj.getRowId())
+                pageName = 'Requested Qoutations Page'
+                userName = userObj.getFirstName()
+                pageNavDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
+                headerDisplay = 'Input key to select corresponding option'
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
+                self.displayPage(displayDict)
+                #navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
+                #displayPage('Requested Quotations Page', userObj.getFirstName(), quotationList, navPageDict, state)
+                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
+                if not invalidSelectionFlag:
+                    if selection == 'B':
+                        state = 2
+                    elif selection in pageNavDict:
+                        state = self.navOptions(selection, state)
+                    else:
+                        # take to next state to display hall listing
+                        state = 6
+                else:
+                    print('Invalid selection, Please input again')
+
+            while state == 6:
+                index = int(selection)
+                optionDisplay = Quotation.viewQuotationDetails(index)
+                pageName = 'Quotation Details Page'
+                userName = userObj.getFirstName()
+                if(optionDisplay[5] == 'Pending'):
+                    pageNavDict = {'A': 'Accept', 'M':'Modify','R': 'Reject','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                else:
+                    pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                headerDisplay = 'Input key to select corresponding option'
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
+                self.displayPage(displayDict)
+                #displayPage('Quotation Details', userObj.getFirstName(), quotationDetails, navPageDict, state)
+                #placeholder dictionary
+                QuotationPage = dict()
+                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
+                if not invalidSelectionFlag:
+                    if selection in pageNavDict:
+                        if selection == 'B':
+                            state = 5
+                        if selection == 'M':
+                            newAmount = input('Enter New Quotation Amount: ')
                             confirmation = input('Confirm Modification Request(Y/N): ')
                             if confirmation.isalpha():
                                 if confirmation.lower() == 'y':
                                     #create object of quotations
-                                    hallObj = Hall(hallModify)
-                                    hallObj.modifyhall(hallDetails[0], hallModify)
+                                    Quotation.changeAmount(quotationDetails[0], newAmount)
                                 elif confirmation.lower() == 'n':
                                     print('Taking back to previous menu')
                                     time.sleep(1)
-                        state = 3
-                    elif selection == 'D':
-                        hallDelete = dict()
-                        hallDelete['requested'] = True
-                        confirmation = input('Confirm Delete Request(Y/N): ')
-                        if confirmation.isalpha():
-                            if confirmation.lower() == 'y':
-                                #create object of quotations
-                                hallObj = Hall(hallDelete)
-                                hallObj.deletehall(hallDetails[0])
-                            elif confirmation.lower() == 'n':
-                                print('Taking back to previous menu')
-                                time.sleep(1)
-                        state = 3
-                    else:
-                        state = navOptions(selection, state)
-            else:
-                print('Invalid selection, Please input again')
-
-        while state == 5:
-            quotationList = Quotation.listOwnerQuotationRequests(userObj.getRowId())
-            navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
-            displayPage('Requested Quotations Page', userObj.getFirstName(), quotationList, navPageDict, state)
-            invalidSelectionFlag, selection = selectOption(quotationList, navPageDict)
-            if not invalidSelectionFlag:
-                if selection == 'B':
-                    state = 2
-                elif selection in navPageDict:
-                    state = navOptions(selection, state)
+                                state = 5
+                        elif selection == 'A':
+                            confirmation = input('Confirm Accept Request(Y/N): ')
+                            if confirmation.isalpha():
+                                if confirmation.lower() == 'y':
+                                    #create object of quotations
+                                    Quotation.changeStatus(optionDisplay[0], 'Approved')
+                                elif confirmation.lower() == 'n':
+                                    print('Taking back to previous menu')
+                                    time.sleep(1)
+                                state = 5
+                        elif selection == 'R':
+                            confirmation = input('Confirm Reject Request(Y/N): ')
+                            if confirmation.isalpha():
+                                if confirmation.lower() == 'y':
+                                    #create object of quotations
+                                    Quotation.changeStatus(optionDisplay[0], 'Rejected')
+                                elif confirmation.lower() == 'n':
+                                    print('Taking back to previous menu')
+                                    time.sleep(1)
+                                state = 5
+                        else:
+                            state = self.navOptions(selection, state)
                 else:
-                    # take to next state to display hall listing
-                    state = 6
-            else:
-                print('Invalid selection, Please input again')
+                    print('Invalid selection, Please input again')
 
-        while state == 6:
-            index = int(selection)
-            quotationDetails = Quotation.viewQuotationDetails(index)
-            if(quotationDetails[5] == 'Pending'):
-                navPageDict = {'A': 'Accept', 'M':'Modify','R': 'Reject','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-            else:
-                navPageDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-            displayPage('Quotation Details', userObj.getFirstName(), quotationDetails, navPageDict, state)
-            #placeholder dictionary
-            QuotationPage = dict()
-            invalidSelectionFlag, selection = selectOption(QuotationPage, navPageDict)
-            if not invalidSelectionFlag:
-                if selection in navPageDict:
-                    if selection == 'M':
-                        newAmount = input('Enter New Quotation Amount: ')
-                        confirmation = input('Confirm Modification Request(Y/N): ')
-                        if confirmation.isalpha():
-                            if confirmation.lower() == 'y':
-                                #create object of quotations
-                                Quotation.changeAmount(quotationDetails[0], newAmount)
-                            elif confirmation.lower() == 'n':
-                                print('Taking back to previous menu')
-                                time.sleep(1)
-                            state = 5
-                    elif selection == 'A':
-                        confirmation = input('Confirm Accept Request(Y/N): ')
-                        if confirmation.isalpha():
-                            if confirmation.lower() == 'y':
-                                #create object of quotations
-                                Quotation.changeStatus(quotationDetails[0], 'Approved')
-                            elif confirmation.lower() == 'n':
-                                print('Taking back to previous menu')
-                                time.sleep(1)
-                            state = 5
-                    elif selection == 'R':
-                        confirmation = input('Confirm Reject Request(Y/N): ')
-                        if confirmation.isalpha():
-                            if confirmation.lower() == 'y':
-                                #create object of quotations
-                                Quotation.changeStatus(quotationDetails[0], 'Rejected')
-                            elif confirmation.lower() == 'n':
-                                print('Taking back to previous menu')
-                                time.sleep(1)
-                            state = 5
-                    else:
-                        state = navOptions(selection, state)
-            else:
-                print('Invalid selection, Please input again')
+            while state == 7:
+                optionDisplay = Booking.listOwnerBookings(userObj.getRowId())
+                pageName = 'Completed Bookings'
+                userName = userObj.getFirstName()
+                pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state}
+                # tableHeader =
+                self.displayPage(displayDict)
+                placeHolder = dict()
+                invalidSelectionFlag, selection = self.selectOption(placeHolder, pageNavDict)
+                if not invalidSelectionFlag:
+                    if selection in pageNavDict:
+                        if selection == 'B':
+                            state = 2
+                        else:
+                            state = self.navOptions(selection, state)
+                else:
+                    print('Invalid selection, Please input again')
 
-    return state
+        self.state =  state

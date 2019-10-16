@@ -159,6 +159,16 @@ class Booking:
         conn.close()
         return output
 
+    @classmethod
+    def listOwnerBookings(cls, ownerId):
+        conn = sqlite3.connect(cls.dbFileName)
+        c = conn.cursor()
+        c.execute("SELECT rowid, * FROM Bookings WHERE hallId IN" +
+                    "(SELECT rowid from halls WHERE ownerId = :ownerId)", {'ownerId': ownerId,})
+        results = c.fetchall()
+        conn.close()
+        return results
+
 
     # @classmethod
     # def BookingExists(cls, bookingStartDate, userObj):

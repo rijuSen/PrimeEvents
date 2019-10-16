@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives import hashes
 from user.user import *
 
 from customerController import CustomerController
-from ownerController import ownerController
+from ownerController import OwnerController
 
 class Boundary:
     """Boudary class for Primer Events"""
@@ -273,7 +273,8 @@ class Boundary:
                 customerController = CustomerController(userObj)
                 state = customerController.getState()
             while state == 2 and userObj.getUserType() == 'Owner':
-                state = ownerController(userObj)
+                ownerController = OwnerController(userObj)
+                state = ownerController.getState()
             print(state)
         else:
             exit()
