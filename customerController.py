@@ -4,6 +4,7 @@ import datetime
 from hall.hall import Hall
 from quotation.quotation import Quotation
 from booking.booking import Booking
+from payment.payment import Payment
 
 class CustomerController:
     """Customer Controller"""
@@ -69,10 +70,10 @@ class CustomerController:
                 print('-' * 105)
 
             elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 9:
-                tableHeader = ("{0:^5}{1:^20}{2:^20}{3:^5}{4:^15}".format('ID', 'Start-Date', 'End-Date', 'Hall ID', 'Amount Paid'))
+                tableHeader = ("{0:^5}{1:^20}{2:^20}{3:^5}{4:^15}{5:^20}".format('ID', 'Start-Date', 'End-Date', 'Hall ID', 'Amount Paid', 'Status'))
                 print("{0:^105}".format(tableHeader))
                 for row in inputDict['optionDisplay']:
-                    rowWise = ("{0:^5}{1:^20}{2:^20}{3:^5}{4:^15}".format(row[0], row[1], row[2], row[3], row[6]))
+                    rowWise = ("{0:^5}{1:^20}{2:^20}{3:^5}{4:^15}{5:^20}".format(row[0], row[1], row[2], row[3], row[6], row[5]))
                     print('{:^105}'.format(rowWise))
                 print('-' * 105)
 
@@ -376,7 +377,7 @@ class CustomerController:
                 if customerConfirmCounter == 0:
                     print('Maximum Taking back to previous menu')
                     time.sleep(2)
-                    state = self.navOptions('B', state)
+                    state = 5
 
             #display all quotation requests made by the customer
             while state == 7:
@@ -432,9 +433,35 @@ class CustomerController:
                         if selection == 'B':
                             state = 7
                         elif selection == 'P':
-                            input('Press enter to make payment')
-                            bookingObj = Booking(bookingInfo)
-                            state = 9
+                            paytype = input('Select Payment Option: \n [1] Cash \n [2] Coupon \n Enter your choice: ')
+                            if paytype.isdigit():
+                                if paytype == '1':
+                                    #create object of quotations
+                                    bookingObj = Booking(bookingInfo)
+                                    paymentInfo = dict()
+                                    paymentInfo['paymentType'] = 'Cash'
+                                    paymentInfo['paymentAmount'] = bookingInfo['bookingAmount']
+                                    paymentInfo['bookingId'] = bookingObj.getRowId()
+                                    paymentInfo['customerId'] = userObj.getRowId()
+                                    paymentObj = Payment(paymentInfo)
+                                    bookingObj.addPaymentInfo(paymentObj.getRowId())
+                                    state = 9
+                                    break
+                                elif paytype == '2':
+                                    couponCode = input('Please Enter the coupon code: ')
+                                    bookingObj = Booking(bookingInfo)
+                                    paymentInfo = dict()
+                                    paymentInfo['paymentType'] = 'Cash'
+                                    paymentInfo['couponCode'] = couponCode
+                                    paymentInfo['paymentAmount'] = bookingInfo['bookingAmount']
+                                    paymentInfo['bookingId'] = bookingObj.getRowId()
+                                    paymentInfo['customerId'] = userObj.getRowId()
+                                    paymentObj = Payment(paymentInfo)
+                                    bookingObj.addPaymentInfo(paymentObj.getRowId())
+                                    state = 9
+                                    break
+                                else:
+                                    print('Invalid input!! Try again')
                         else:
                             state = self.navOptions(selection, state)
                 else:

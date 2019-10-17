@@ -4,6 +4,7 @@ import datetime
 from hall.hall import Hall
 from quotation.quotation import Quotation
 from booking.booking import Booking
+from payment.payment import Payment
 
 class OwnerController:
     """Owner Controller"""
@@ -73,11 +74,20 @@ class OwnerController:
                     print('{:^105}'.format(tempString))
                 print('-' * 105)
 
+            elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 8:
+                tableHeader = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format('Key', 'Booking ID', 'Type', 'Amount', 'Customer', 'Coupon Code', 'Status'))
+                print("{0:^105}".format(tableHeader))
+                # for value in optionDisplay:
+                for tup in inputDict['optionDisplay']:
+                    tempString = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format(tup[0], tup[5], tup[1], tup[3], tup[6], tup[2], tup[4]))
+                    print('{:^105}'.format(tempString))
+                print('-' * 105)
+
             elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 7:
-                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^10}{4:^10}{5:^10}".format('ID', 'Start-Date', 'End-Date', 'Hall ID', 'Customer','Amount Paid'))
+                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^10}{4:^10}{5:^10}{6:^10}".format('ID', 'Start-Date', 'End-Date', 'Hall ID', 'Customer','Amount Paid', 'Status'))
                 print("{0:^105}".format(tableHeader))
                 for row in inputDict['optionDisplay']:
-                    rowWise = ("{0:^5}{1:^15}{2:^15}{3:^10}{4:^10}{5:^10}".format(row[0], row[1], row[2], row[3], row[4], row[6]))
+                    rowWise = ("{0:^5}{1:^15}{2:^15}{3:^10}{4:^10}{5:^10}{6:^10}".format(row[0], row[1], row[2], row[3], row[4], row[6], row[5]))
                     print('{:^105}'.format(rowWise))
                 print('-' * 105)
                 # navigation panel
@@ -103,6 +113,14 @@ class OwnerController:
                 print("{0:^105}".format(tableHeader))
                 # for value in optionDisplay:
                 tempString = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][1], inputDict['optionDisplay'][2], inputDict['optionDisplay'][3], inputDict['optionDisplay'][4], inputDict['optionDisplay'][5], inputDict['optionDisplay'][6]))
+                print('{:^105}'.format(tempString))
+                print('-' * 105)
+
+            elif isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 9:
+                tableHeader = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format('Key', 'Booking ID', 'Type', 'Amount', 'Customer', 'Coupon Code', 'Status'))
+                print("{0:^105}".format(tableHeader))
+                # for value in optionDisplay:
+                tempString = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][5], inputDict['optionDisplay'][1], inputDict['optionDisplay'][3], inputDict['optionDisplay'][6], inputDict['optionDisplay'][2], inputDict['optionDisplay'][4]))
                 print('{:^105}'.format(tempString))
                 print('-' * 105)
 
@@ -335,7 +353,7 @@ class OwnerController:
 
             while state == 5:
                 optionDisplay = Quotation.listOwnerQuotationRequests(userObj.getRowId())
-                pageName = 'Requested Qoutations Page'
+                pageName = 'Requested Quotations Page'
                 userName = userObj.getFirstName()
                 pageNavDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
                 headerDisplay = 'Input key to select corresponding option'
@@ -381,7 +399,7 @@ class OwnerController:
                             if confirmation.isalpha():
                                 if confirmation.lower() == 'y':
                                     #create object of quotations
-                                    Quotation.changeAmount(quotationDetails[0], newAmount)
+                                    Quotation.changeAmount(optionDisplay[0], newAmount)
                                 elif confirmation.lower() == 'n':
                                     print('Taking back to previous menu')
                                     time.sleep(1)
@@ -425,6 +443,75 @@ class OwnerController:
                     if selection in pageNavDict:
                         if selection == 'B':
                             state = 2
+                        else:
+                            state = self.navOptions(selection, state)
+                else:
+                    print('Invalid selection, Please input again')
+
+            while state == 8:
+                optionDisplay = Payment.listOwnerPaymentRequests(userObj.getRowId())
+                pageName = 'Requested Payments Page'
+                userName = userObj.getFirstName()
+                pageNavDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
+                headerDisplay = 'Input key to select corresponding option'
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
+                self.displayPage(displayDict)
+                #navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
+                #displayPage('Requested Quotations Page', userObj.getFirstName(), quotationList, navPageDict, state)
+                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
+                if not invalidSelectionFlag:
+                    if selection == 'B':
+                        state = 2
+                    elif selection in pageNavDict:
+                        state = self.navOptions(selection, state)
+                    else:
+                        # take to next state to display hall listing
+                        state = 9
+                else:
+                    print('Invalid selection, Please input again')
+
+            while state == 9:
+                index = int(selection)
+                optionDisplay = Payment.viewPaymentDetails(index)
+                pageName = 'Payments Details Page'
+                userName = userObj.getFirstName()
+                if(optionDisplay[4] == 'Pending'):
+                    pageNavDict = {'A': 'Accept', 'R': 'Reject','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                else:
+                    pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                headerDisplay = 'Input key to select corresponding option'
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
+                self.displayPage(displayDict)
+                #displayPage('Quotation Details', userObj.getFirstName(), quotationDetails, navPageDict, state)
+                #placeholder dictionary
+                QuotationPage = dict()
+                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
+                if not invalidSelectionFlag:
+                    if selection in pageNavDict:
+                        if selection == 'B':
+                            state = 8
+                        elif selection == 'A':
+                            confirmation = input('Confirm Accept Request(Y/N): ')
+                            if confirmation.isalpha():
+                                if confirmation.lower() == 'y':
+                                    #create object of quotations
+                                    Payment.changeStatus(optionDisplay[0], 'Approved')
+                                    Booking.changeStatus(optionDisplay[5], 'Confirmed')
+                                elif confirmation.lower() == 'n':
+                                    print('Taking back to previous menu')
+                                    time.sleep(1)
+                                state = 8
+                        elif selection == 'R':
+                            confirmation = input('Confirm Reject Request(Y/N): ')
+                            if confirmation.isalpha():
+                                if confirmation.lower() == 'y':
+                                    #create object of quotations
+                                    Payment.changeStatus(optionDisplay[0], 'Rejected')
+                                    Booking.changeStatus(optionDisplay[5], 'Declined')
+                                elif confirmation.lower() == 'n':
+                                    print('Taking back to previous menu')
+                                    time.sleep(1)
+                                state = 8
                         else:
                             state = self.navOptions(selection, state)
                 else:

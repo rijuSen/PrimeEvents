@@ -1,5 +1,6 @@
 #class for Booking in prime events
 import sqlite3
+import time
 from pathlib import Path
 
 class Booking:
@@ -24,11 +25,14 @@ class Booking:
 #                   FOREIGN KEY(quotationId) REFERENCES quotations(rowid),
 #                   FOREIGN KEY(hallId) REFERENCES halls(rowid));
             with conn:
-                c.execute("INSERT INTO Bookings VALUES (:bookingStartDate, :bookingEndDate, :hallId, :customerId, :status, :bookingAmount, :quotationId)",
+                c.execute("INSERT INTO Bookings VALUES (:bookingStartDate, :bookingEndDate, :hallId, :customerId, :status, :bookingAmount, :quotationId, NULL)",
                         { 'bookingStartDate': self.bookingStartDate, 'bookingEndDate': self.bookingEndDate, 'hallId': self.hallId, 'customerId': self.customerId, 'status': self.status, 'bookingAmount': self.bookingAmount, 'quotationId': self.quotationId})
             c.execute("SELECT rowid from Bookings WHERE quotationId = :quotationId",{'quotationId': self.quotationId,})
             #save the rowid of the inserted row in the variable rowId
+            time.sleep(2)
             for id in c.fetchone():
+                #print('reached')
+                #time.sleep(2)
                 self.rowId = id
                 # strDebug = '{}{}'.format('Booking row inserted and rowId is ',id)
                 # input(strDebug)
@@ -55,7 +59,7 @@ class Booking:
             self.bookingEndDate = bookingInfo['bookingEndDate']
             self.hallId = bookingInfo['hallId']
             self.customerId = bookingInfo['customerId']
-            self.status = 'Completed'
+            self.status = 'Initiated'
             self.bookingAmount = bookingInfo['bookingAmount']
             self.quotationId = bookingInfo['quotationId']
             self.insertIntoBookingDb()
@@ -127,6 +131,17 @@ class Booking:
     def getBookingAmount(self):
         return self.bookingAmount
 
+    def addPaymentInfo(self, paymentId):
+        self.paymentId = paymentId
+        conn = sqlite3.connect(Booking.dbFileName)
+        c = conn.cursor()
+        try:
+            with conn:
+                c.execute("""UPDATE Bookings SET paymentId = :paymentId WHERE rowid = :rowId""",{'paymentId ': self.paymentId , 'rowId': self.rowId})
+        except sqlite3.Error as sqlite3Error:
+            print("SQLite3 Error -->",sqlite3Error)
+        finally:
+            conn.close()
 
     @classmethod
     def viewAllBookings(cls):
@@ -161,9 +176,35 @@ class Booking:
 
     @classmethod
     def listOwnerBookings(cls, ownerId):
-        conn = sqlite3.connect(cls.dbFileName)
+        conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid, * FROM Bookings WHERE hallId IN" +
+                    "(SELECT rowid from halls WHERE ownerId = :ownerId)", {'ownerId': ownerId,})
+        results = c.fetchall()
+        conn.close()
+        return results
+
+    @classmethod
+    def changeStatus(self, rowId, status):
+        self.status = status
+        """Only first name, last name and password can be modified"""
+        conn = sqlite3.connect(Booking.dbFileName)
+        c = conn.cursor()
+        try:
+            with conn:
+                c.execute(
+                    """UPDATE Bookings SET status = :status WHERE rowid = :bookingId""",
+                    {'status': status, 'bookingId': rowId})
+        except sqlite3.Error as sqlite3Error:
+            print("SQLite3 Error -->", sqlite3Error)
+        finally:
+            conn.close()
+
+    @classmethod
+    def getOwnerBookingIds(cls, ownerId):
+        conn = sqlite3.connect(Booking.dbFileName)
+        c = conn.cursor()
+        c.execute("SELECT rowid FROM Bookings WHERE hallId IN" +
                     "(SELECT rowid from halls WHERE ownerId = :ownerId)", {'ownerId': ownerId,})
         results = c.fetchall()
         conn.close()
