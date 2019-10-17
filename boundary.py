@@ -1,38 +1,41 @@
 import getpass
 import os
 import time
+import re
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
-from user.user import *
+from user.user import User
+from user.user import Admin
+from user.user import Customer
+from user.user import Owner
 
 from customerController import CustomerController
 from ownerController import OwnerController
 
 class Boundary:
-    """Boudary class for Primer Events"""
+    """The Boundary object contains a user's interaction with the system
+
+    Args:
+    Attributes:
+    """
 
     def __init__(self):
         self.runCode()
 
+    def __repr__(self):
+        return "Boundary()"
 
     def displayPage(self,inputDict):
-        """if userName exists then will be displayed on self.selectOption
-        if optionDisplay exists then display
-            if optionDisplay is a dict display as dict
-            if optionDisplay is a list display as list
-            {'pageName':, 'userName': , 'optionDisplay':, 'pageNavDict': , 'footerDisplay': , 'state': , 'headerDisplay': }
-        pageName = inputDict['pageName']
-        userName = inputDict['userName']
-        optionDisplay = inputDict['optionDisplay']
-        pageNavDict = inputDict['pageNavDict']
-        footerDisplay = inputDict['footerDisplay']
-        state = inputDict['state']
-        headerDisplay = inputDict['headerDisplay']
-        {'pageName': pageName = None, 'userName': userName = None, 'optionDisplay': optionDisplay = None, 'pageNavDict': pageNavDict = None, 'state': state}"""
+        """This is the only function which will display on the Screen
+            Args:
+                - inputDict -- a dictionary with keys {'pageName', 'userName', 'optionDisplay', 'pageNavDict', 'footerDisplay', 'state', 'headerDisplay'}
+                    pageName is mandatory and rest all are optional
+            Raises:
+            Returns:
+        """
         os.system('clear')
-        # Display Page Name
         print('-' * 105)
         print('{0:^105}'.format(inputDict['pageName']))
         print('-' * 105)
@@ -56,15 +59,6 @@ class Boundary:
                     # print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
                 print('-' * 105)
                 # navigation panel
-            if isinstance(inputDict['optionDisplay'], list) and inputDict['state'] == 7:
-                tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('ID', 'Request Date-Time', 'Booking Start-Date', 'Booking End-Date', 'Hall ID', 'Status', 'Charge'))
-                print("{0:^105}".format(tableHeader))
-                # for value in optionDisplay:
-                for tup in inputDict['optionDisplay']:
-                    tempString = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format(tup[0], tup[1], tup[2], tup[3], tup[4], tup[6], tup[7]))
-                    print('{:^105}'.format(tempString))
-                print('-' * 105)
-
             elif isinstance(inputDict['optionDisplay'], list):
                 # print("Its a list")
                 # time.sleep(2)
@@ -76,20 +70,9 @@ class Boundary:
                     rowWise = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(row[0], row[1], row[3], row[4], row[5]))
                     print('{:^105}'.format(rowWise))
                 print('-' * 105)
-                # navigation panel
-
-            if isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 5:
-                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format('ID', 'Venue', 'Tariff/day', 'Function Type', 'Address', 'Capacity'))
-                print("{0:^105}".format(tableHeader))
-                # for value in optionDisplay:
-                tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][1], inputDict['optionDisplay'][3], inputDict['optionDisplay'][4], inputDict['optionDisplay'][5], inputDict['optionDisplay'][6]))
-                print('{:^105}'.format(tempString))
-                print('-' * 105)
-
-            if 'footerDisplay' in inputDict.keys():
-                print('{0:^105}'.format(inputDict['footerDisplay']))
-                print('-' * 105)
-                # navigation panel
+        if 'footerDisplay' in inputDict.keys():
+            print('{0:^105}'.format(inputDict['footerDisplay']))
+            print('-' * 105)
         if 'pageNavDict' in inputDict.keys():
             navBar = ''
             for key, option in inputDict['pageNavDict'].items():
@@ -99,10 +82,17 @@ class Boundary:
             print('-' * 105)
 
     def selectOption(self,optionDisplay, pageNavDict):
-        """selection made is from either dictionary keys or list indices
-        return true and null string if invalid selection made and
-        return false and selection in appropriate format if valid selection is made"""
-        # prompt user to select option
+        """This function allows selection to be made from either dictionary keys or list indices provided as arguments
+            Args:
+                - optionDisplay -- a dictionary or a list
+                - pageNavDict -- a dictionary
+            Raises:
+            Returns:
+                - success -- boolean
+                    true if invalid selection made
+                    false if valid selection is made
+                - state -- int
+        """
         selection = input('Enter your selection: ')
         if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
             print('Your selection: {}'.format(optionDisplay.get(selection)))
@@ -129,10 +119,13 @@ class Boundary:
             return True, ''
 
     def navOptions(self,selection, state):
-        """
-
-        :param selection:
-        :type state: object
+        """This function returns the state necessary to Logout or Exit
+            Args:
+                - selection -- string
+                - state -- int
+            Raises:
+            Returns:
+                - state -- int
         """
         if selection == 'O':
             state = 1
@@ -141,6 +134,12 @@ class Boundary:
         return state
 
     def getPass(self,):
+        """This function handles password prompt and hashing
+            Args:
+            Raises:
+            Returns:
+                - passHash -- string hashed password
+        """
         # check password length more than or equal to 8
         passFlag = False
         while not passFlag:
@@ -160,6 +159,17 @@ class Boundary:
         return passHash
 
     def acceptUserDetails(self,):
+        """This function handles user registeration
+            Args:
+            Raises:
+            Returns:
+                - mailExistFlag -- boolean
+                    true if mail id already exists in the system
+                    false if mail id doesn't exist and can be used
+                - userInfo -- dictionary
+                    userName
+                    password
+        """
         os.system('clear')
         print('=' * 41)
         print('{:^41}'.format('Registration Page'))
@@ -170,7 +180,15 @@ class Boundary:
         mailExistFlag = True
         retryCount = 0
         while mailExistFlag and retryCount < 3:
-            userInfo['email'] = input('Enter Email Id: ')
+            mailFormat = True
+            while mailFormat == True and retryCount < 3:
+                eMail = input('Enter Email Id: ')
+                if re.match("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",eMail):
+                    userInfo['email'] = eMail
+                    mailFormat = False
+                else:
+                    retryCount = retryCount + 1
+                    print("Not a valid mail id!! Kindly try again.")
             mailExistFlag = Owner.emailExists(userInfo['email'])
             retryCount = retryCount + 1
             if mailExistFlag == True and retryCount < 3:
@@ -183,6 +201,14 @@ class Boundary:
         return mailExistFlag, userInfo
 
     def userLogin(self,):
+        """This function handles user login
+            Args:
+            Raises:
+            Returns:
+                - userInfo -- dictionary
+                    success - boolean
+                    userObj - object of User Class
+        """
         loginFlag = False
         retryCount = 0
         while not loginFlag and retryCount < 3:
@@ -205,6 +231,11 @@ class Boundary:
         return {'success': success, 'userObj': userObj}
 
     def runCode(self):
+        """This function controls flow of logic
+            Args:
+            Raises:
+            Returns:
+        """
         state = 1
         while state > 0:
             # state 1 represent login action
@@ -247,11 +278,6 @@ class Boundary:
                         else:
                             userObj = Customer(userInfo)
                             state = 2
-                            print('User info is {}'.format(userInfo))
-                            print('State is {} and session ID is {} and user type is {}'.format(state,
-                                                                                                userObj.getRowId(),
-                                                                                                userObj.getUserType()))
-                            time.sleep(2)
                     elif selection == 'L':
                         objDict = self.userLogin()
                         if objDict['success']:
@@ -283,4 +309,3 @@ class Boundary:
 
 if __name__ == "__main__":
     boundaryObj = Boundary()
-    boundaryObj.main()

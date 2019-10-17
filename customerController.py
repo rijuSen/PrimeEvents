@@ -15,32 +15,29 @@ class CustomerController:
     def getState(self):
         return self.state
 
+    def __repr__(self):
+        pass
+
     def displayPage(self, inputDict):
-        """if userName exists then will be displayed on self.selectOption
-        if optionDisplay exists then display
-            if optionDisplay is a dict display as dict
-            if optionDisplay is a list display as list
-            {'pageName':, 'userName': , 'optionDisplay':, 'pageNavDict': , 'footerDisplay': , 'state': , 'headerDisplay': }
-        pageName = inputDict['pageName']
-        userName = inputDict['userName']
-        optionDisplay = inputDict['optionDisplay']
-        pageNavDict = inputDict['pageNavDict']
-        footerDisplay = inputDict['footerDisplay']
-        state = inputDict['state']
-        headerDisplay = inputDict['headerDisplay']
-        {'pageName': pageName = None, 'userName': userName = None, 'optionDisplay': optionDisplay = None, 'pageNavDict': pageNavDict = None, 'state': state}"""
+        """This is the only function which will display on the Screen
+            Args:
+                - inputDict -- a dictionary with keys {'pageName', 'userName', 'optionDisplay', 'pageNavDict', 'footerDisplay', 'state', 'headerDisplay'}
+                    pageName is mandatory and rest all are optional
+            Raises:
+            Returns:
+        """
         os.system('clear')
-        # Display Page Name
         print('-' * 105)
         print('{0:^105}'.format(inputDict['pageName']))
         print('-' * 105)
-        # Display User Name
         if 'userName' in inputDict.keys():
             print('{0:^105}'.format('Logged in as ' + inputDict['userName'].capitalize()))
             print('-' * 105)
+
         if 'headerDisplay' in inputDict.keys():
             print('{:^105}'.format(inputDict['headerDisplay']))
             print('-' * 105)
+
         if 'optionDisplay' in inputDict.keys():
             if isinstance(inputDict['optionDisplay'], dict) and 'state' in inputDict.keys() and inputDict['state'] == 8:
                 tempString = '{0:^30}{1:^40}'.format('Attribute', 'Value')
@@ -61,7 +58,7 @@ class CustomerController:
                     print('{:^105}'.format(tempString))
                     # print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
                 print('-' * 105)
-                # navigation panel
+
             elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 7:
                 tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('ID', 'Request Date-Time', 'Booking Start-Date', 'Booking End-Date', 'Hall ID', 'Status', 'Charge'))
                 print("{0:^105}".format(tableHeader))
@@ -72,25 +69,13 @@ class CustomerController:
                 print('-' * 105)
 
             elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 9:
-                # CREATE TABLE bookings (
-                #                   bookingStartDate date NOT NULL,
-                #                   bookingEndDate date NOT NULL,
-                #                   hallId int NOT NULL,
-                #                   customerId int NOT NULL,
-                #                   status boolean NOT NULL,
-                #                   bookingAmount float NOT NULL,
-                #                   quotationId int NOT NULL,
-                #                   UNIQUE(quotationId),
-                #                   FOREIGN KEY(customerId) REFERENCES users(rowid),
-                #                   FOREIGN KEY(quotationId) REFERENCES quotations(rowid),
-                #                   FOREIGN KEY(hallId) REFERENCES halls(rowid));
                 tableHeader = ("{0:^5}{1:^20}{2:^20}{3:^5}{4:^15}".format('ID', 'Start-Date', 'End-Date', 'Hall ID', 'Amount Paid'))
                 print("{0:^105}".format(tableHeader))
                 for row in inputDict['optionDisplay']:
                     rowWise = ("{0:^5}{1:^20}{2:^20}{3:^5}{4:^15}".format(row[0], row[1], row[2], row[3], row[6]))
                     print('{:^105}'.format(rowWise))
                 print('-' * 105)
-                # navigation panel
+
             elif isinstance(inputDict['optionDisplay'], list):
                 tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format('Key', 'Venue', 'Type', 'Addr', 'Capacity'))
                 print("{0:^105}".format(tableHeader))
@@ -98,7 +83,6 @@ class CustomerController:
                     rowWise = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(row[0], row[1], row[3], row[4], row[5]))
                     print('{:^105}'.format(rowWise))
                 print('-' * 105)
-                # navigation panel
 
             elif isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 5:
                 tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format('ID', 'Venue', 'Tariff/day', 'Function Type', 'Address', 'Capacity'))
@@ -107,19 +91,11 @@ class CustomerController:
                 tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][1], inputDict['optionDisplay'][3], inputDict['optionDisplay'][4], inputDict['optionDisplay'][5], inputDict['optionDisplay'][6]))
                 print('{:^105}'.format(tempString))
                 print('-' * 105)
-            #for display of booking
-            # elif isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 9:
-            #     tableHeader = ("{0:^5}{1:^20}{2:^20}{3:^15}{4:^15}{5:^15}".format('ID', 'Start-Date', 'End-Date', 'Hall ID', 'Status', 'Amount Paid'))
-            #     print("{0:^105}".format(tableHeader))
-            #     # for value in optionDisplay:
-            #     tempString = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}{5:^15}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][1], inputDict['optionDisplay'][2], inputDict['optionDisplay'][3], inputDict['optionDisplay'][5], inputDict['optionDisplay'][6]))
-            #     print('{:^105}'.format(tempString))
-            #     print('-' * 105)
 
         if 'footerDisplay' in inputDict.keys():
             print('{0:^105}'.format(inputDict['footerDisplay']))
             print('-' * 105)
-            # navigation panel
+
         if 'pageNavDict' in inputDict.keys():
             navBar = ''
             for key, option in inputDict['pageNavDict'].items():
@@ -129,18 +105,21 @@ class CustomerController:
             print('-' * 105)
 
     def selectOption(self, optionDisplay, pageNavDict):
-        """selection made is from either dictionary keys or list indices
-        return true and null string if invalid selection made and
-        return false and selection in appropriate format if valid selection is made"""
-        # prompt user to select option
+        """This function allows selection to be made from either dictionary keys or list indices provided as arguments
+            Args:
+                - optionDisplay -- a dictionary or a list
+                - pageNavDict -- a dictionary
+            Raises:
+            Returns:
+                - success -- boolean
+                    true if invalid selection made
+                    false if valid selection is made
+                - state -- int
+        """
         selection = input('Enter your selection: ')
         if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
             print('Your selection: {}'.format(optionDisplay.get(selection)))
-            # input('Break')
             return False, selection
-        # elif isinstance(optionDisplay, dict) and selection not in optionDisplay.keys():
-        #     print('Your selection: {}'.format(selection))
-        #     return True, ''
         elif isinstance(optionDisplay, list) and selection.isdigit():
             for row in optionDisplay:
                 if row[0] == int(selection):
@@ -159,10 +138,13 @@ class CustomerController:
             return True, ''
 
     def navOptions(self, selection, state):
-        """
-
-        :param selection:
-        :type state: object
+        """This function returns the state necessary to Logout or Exit
+            Args:
+                - selection -- string
+                - state -- int
+            Raises:
+            Returns:
+                - state -- int
         """
         if selection == 'O':
             state = 1
@@ -171,15 +153,36 @@ class CustomerController:
         return state
 
     def calculateQuote(self, sDate,eDate,hallId):
+        """This function returns the calculated charge on the basis of Tariff/day and the number of days
+            Args:
+                - sDate -- date
+                - eDate -- date
+                - hallId -- int
+            Raises:
+            Returns:
+                - charge -- float
+        """
         hallObj = Hall({'hallId': hallId,})
         rate = hallObj.getDayTariff()
         deltaDate = eDate - sDate
-        numberOfDays = deltaDate.days
+        numberOfDays = deltaDate.days + 1
         # hallObj = Hall(hallId)
         # hallObj.getDa()
         return rate * numberOfDays
 
     def acceptDate(self, startDate = None):
+        """This function ensures date is input in correct format
+            Args:
+                - startDate -- date
+            Raises:
+            Returns:
+                - flag -- boolean
+                    True if in correct format
+                    False if in incorrect format
+                - errorInfo/dateObj
+                    error info in case date in incorrect format
+                    object of date if in correct format
+        """
         if startDate == None:
             try:
                 dateStr = input('Enter start date of booking (DD/MM/YYYY): ')
@@ -208,7 +211,12 @@ class CustomerController:
                     return True, dateObj
 
     def customerController(self, userObj):
-        """This method contains all functionality related to the customer"""
+        """This method contains all functionality related to the customer along with the flow
+            Args:
+                - userObj -- User
+            Raises:
+            Returns:
+        """
         state = 2
         while state >= 2:
             #display option to view all halls or search specific hall
@@ -217,8 +225,6 @@ class CustomerController:
                 userName = userObj.getFirstName()
                 optionDisplay = {'1': 'View Halls', '2': 'Search Hall', '3': 'Book Hall', '4': 'View Quotation Requests', '5': 'View Bookings'}
                 pageNavDict = {'O': 'Logout', 'E': 'Exit'}
-                # footerDisplay = footerDisplay
-                # state = state
                 headerDisplay = 'Input key to select corresponding option'
                 displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay}
                 self.displayPage(displayDict)
@@ -228,7 +234,6 @@ class CustomerController:
                     if selection in pageNavDict:
                         state = self.navOptions(selection, state)
                     elif selection == '1':
-                        # take to next state to display hall listing
                         state = 3
                     elif selection == '2':
                         state = 4
@@ -247,10 +252,6 @@ class CustomerController:
                 pageName = 'View All Halls'
                 userName = userObj.getFirstName()
                 optionDisplay = Hall.viewAllHalls()
-                pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-                # footerDisplay = footerDisplay
-                # state = state
-                # headerDisplay = headerDisplay
                 displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state , 'headerDisplay': headerDisplay}
                 # tableHeader =
                 self.displayPage(displayDict)
@@ -269,16 +270,8 @@ class CustomerController:
 
             #display hall details of the hall id entered
             while state == 4:
-                # pageName = pageName
-                # userName = userName
-                # optionDisplay = optionDisplay
-                # pageNavDict = pageNavDict
-                # message = message
-                # state = state
-                # headerDisplay = headerDisplay
                 hallList = Hall.viewAllHalls()
                 navPageDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-                # placeHolder = dict()
                 print('Search hall by hall id ')
                 invalidSelectionFlag, selection = self.selectOption(hallList, navPageDict)
                 if not invalidSelectionFlag:
@@ -419,15 +412,8 @@ class CustomerController:
                     print('Invalid selection, Please input again')
                     time.sleep(2)
 
+            #display the hall details before booking
             while state == 8:
-                """bookingInfo['bookingStartDate','bookingEndDate','hallId','customerId','bookingAmount','quotationId']"""
-                # pageName = pageName
-                # userName = userName
-                # optionDisplay = optionDisplay
-                # pageNavDict = pageNavDict
-                # message = message
-                # state = state
-                # headerDisplay = headerDisplay
                 bookingInfo = {'bookingStartDate': quotationObj.getBookingStartDate(),'bookingEndDate': quotationObj.getBookingEndDate(),'hallId': quotationObj.getHallId(), 'customerId': quotationObj.getCustomerId(),'bookingAmount': quotationObj.getQuotationAmount(),'quotationId': quotationObj.getQuotationId()}
                 optionDisplay = bookingInfo
                 pageName = 'Book Hall'
@@ -454,6 +440,7 @@ class CustomerController:
                 else:
                     print('Invalid selection, Please input again')
 
+            #creation of booking object
             while state == 9:
                 optionDisplay = Booking.viewUserBookings(userObj)
                 pageName = 'Completed Bookings'
