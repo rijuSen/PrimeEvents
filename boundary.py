@@ -94,6 +94,7 @@ class Boundary:
                 - state -- int
         """
         selection = input('Enter your selection: ')
+        selection = selection.upper()
         if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
             print('Your selection: {}'.format(optionDisplay.get(selection)))
             # input('Break')

@@ -102,6 +102,9 @@ class Hall:
     def getDayTariff(self):
         return self.dayTariff
 
+    def getHallId(self):
+        return self.rowId
+
 
     @classmethod
     def viewAllHalls(cls):

@@ -17,7 +17,7 @@ class User:
             c = conn.cursor()
             c.execute("""CREATE TABLE users (
                         firstName text NOT NULL,
-                        lastName text NOT NULL, 
+                        lastName text NOT NULL,
                         email text NOT NULL UNIQUE,
                         password text NOT NULL,
                         userType text NOT NULL,
@@ -197,7 +197,7 @@ class Admin(User):
         c.execute("SELECT rowid,firstName, lastName, email, userType, allowFlag FROM users")
         output = c.fetchall()
         for entry in output:
-            print(entry, end='\n')
+            print(entry)
         conn.close()
 
     def blockUser(rowid):

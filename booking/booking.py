@@ -1,6 +1,7 @@
 #class for Booking in prime events
 import sqlite3
 import time
+import datetime
 from pathlib import Path
 
 class Booking:
@@ -87,6 +88,18 @@ class Booking:
         finally:
             conn.close()
 
+    # @classmethod
+    # def checkHallAvailability(cls, hallObj, startDate, endDate):
+    #     listOfBookings = Booking.viewAllBookings()
+    #     hallId = hallObj.getHallId()
+    #     for bookingRow in listOfBookings:
+    #         if bookingRow[0] == hallId:
+    #             if startDate >= bookingRow[1] and endDate <= bookingRow[2]:
+    #                 return False
+    #     else:
+    #         return True
+
+
     @classmethod
     def editBooking(cls,editBookingOfbookingEndDate,editbookingStartDate,bookingStartDate,customerId,status,bookingAmount):
         """Except bookingEndDate rest all attributes can be modified"""
@@ -148,7 +161,7 @@ class Booking:
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid,* FROM Bookings")
-        output = c.fetcBooking()
+        output = c.fetchall()
         #print(output)
         #print(type(output))
         conn.close()

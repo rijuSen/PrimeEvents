@@ -48,6 +48,7 @@ class CustomerController:
                     print('{:^105}'.format(tempString))
                 print('-' * 105)
 
+
             elif isinstance(inputDict['optionDisplay'], dict):
                 # Menu Options format
                 tempString = '{0:^5}{1:^30}'.format('[Keys]', 'Options')
@@ -58,6 +59,14 @@ class CustomerController:
                     tempString = '{0:^5}{1:^30}'.format('['+ key +']', option)
                     print('{:^105}'.format(tempString))
                     # print('{0:>4}{1}{2:<5}{3:^30}'.format('[', key, ']', option))
+                print('-' * 105)
+
+            elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 3:
+                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^20}{5:^15}".format('ID', 'Venue', 'Tariff/Day', 'Type', 'Addr', 'Capacity'))
+                print("{0:^105}".format(tableHeader))
+                for row in inputDict['optionDisplay']:
+                    rowWise = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^20}{5:^15}".format(row[0], row[1], row[3], row[4], row[5], row[6]))
+                    print('{:^105}'.format(rowWise))
                 print('-' * 105)
 
             elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 7:
@@ -118,6 +127,7 @@ class CustomerController:
                 - state -- int
         """
         selection = input('Enter your selection: ')
+        selection = selection.upper()
         if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
             print('Your selection: {}'.format(optionDisplay.get(selection)))
             return False, selection
@@ -153,7 +163,7 @@ class CustomerController:
             state = 0
         return state
 
-    def calculateQuote(self, sDate,eDate,hallId):
+    def calculateQuote(self, sDate, eDate, hallId):
         """This function returns the calculated charge on the basis of Tariff/day and the number of days
             Args:
                 - sDate -- date
@@ -211,6 +221,36 @@ class CustomerController:
                 else:
                     return True, dateObj
 
+    def getAvailableHalls(self, startDate, endDate):
+        hallList = Hall.viewAllHalls()
+        # input(hallList)
+        bookingList = Booking.viewAllBookings()
+        # input(bookingList)
+        availableHalls = list()
+        for hallRow in hallList:
+            for bookingRow in bookingList:
+                if hallRow[0] == bookingRow[3]:
+                    # strDebug = '{}{}{}'.format(str(hallRow[0]),' == ', bookingRow[3])
+                    # input(strDebug)
+                    formattedStartDate = bookingRow[1].split('-')
+                    startDateObj = datetime.date(int(formattedStartDate[0]), int(formattedStartDate[1]), int(formattedStartDate[2]))
+                    strDebug = '{}{}{}'.format(startDate,' compared to ',startDateObj)
+                    # input(strDebug)
+                    # input(startDateObj)
+                    formattedEndDate = bookingRow[2].split('-')
+                    endDateObj = datetime.date(int(formattedEndDate[0]), int(formattedEndDate[1]), int(formattedEndDate[2]))
+                    # input(endDateObj)
+                    if startDateObj <= startDate  <= endDateObj or startDateObj <= endDate  <= endDateObj:
+                        break
+            else:
+                availableHalls.append(hallRow)
+                # print(availableHalls)
+        else:
+            return availableHalls
+
+
+
+
     def customerController(self, userObj):
         """This method contains all functionality related to the customer along with the flow
             Args:
@@ -220,7 +260,7 @@ class CustomerController:
         """
         state = 2
         while state >= 2:
-            #display option to view all halls or search specific hall
+            #display menu for customer
             while state == 2:
                 pageName = 'Customer Home Screen'
                 userName = userObj.getFirstName()
@@ -249,12 +289,11 @@ class CustomerController:
 
             #display list of halls and provide selection option
             while state == 3:
-                headerDisplay = 'Input key to select corresponding option'
                 pageName = 'View All Halls'
                 userName = userObj.getFirstName()
                 optionDisplay = Hall.viewAllHalls()
-                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state , 'headerDisplay': headerDisplay}
-                # tableHeader =
+                pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state}
                 self.displayPage(displayDict)
                 invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
                 if not invalidSelectionFlag:
@@ -271,12 +310,43 @@ class CustomerController:
 
             #display hall details of the hall id entered
             while state == 4:
-                hallList = Hall.viewAllHalls()
-                navPageDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-                print('Search hall by hall id ')
-                invalidSelectionFlag, selection = self.selectOption(hallList, navPageDict)
+                print('Filter by Date')
+                #accept date from user for booking start date
+                dateCounter = 3
+                while dateCounter > 0:
+                    dateFlag, dateObj = self.acceptDate()
+                    if dateFlag:
+                        startDate = dateObj
+                        break
+                    else:
+                        dateCounter = dateCounter - 1
+                        print(dateObj,', please try again')
+                else:
+                    print('Maximum retry reached, navigating back')
+                    state = self.navOptions('B', state)
+                #accept date from user for booking end date
+                dateCounter = 3
+                while dateCounter > 0:
+                    dateFlag, dateObj = self.acceptDate(startDate)
+                    if dateFlag:
+                        endDate = dateObj
+                        break
+                    else:
+                        dateCounter = dateCounter - 1
+                        print(dateObj,', please try again')
+                else:
+                    print('Maximum retry reached, navigating back')
+                    state = self.navOptions('B', state)
+                pageName = "Halls available on selected dates"
+                userName = userObj.getFirstName()
+                optionDisplay = self.getAvailableHalls(startDate, endDate)
+                pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                headerDisplay = "Input ID to proceed to ask for quotation"
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay}
+                self.displayPage(displayDict)
+                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
                 if not invalidSelectionFlag:
-                    if selection in navPageDict:
+                    if selection in pageNavDict:
                         if selection == 'B':
                             state = 2
                         else:
@@ -284,8 +354,6 @@ class CustomerController:
                     else:
                         state = 5
                         index = selection
-                        print(type(index), 'and value ',index)
-                        input('index set to selection and state changed to 5')
                 else:
                     print('Invalid selection, Please input again')
 
@@ -296,7 +364,7 @@ class CustomerController:
                 optionDisplay = Hall.viewHallDetails(index)
                 pageNavDict = {'R': 'Request Quote', 'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
                 hallDetails = Hall.viewHallDetails(index)
-                navPageDict = {'R': 'Request Quote', 'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                pageNavDict = {'R': 'Request Quote', 'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
                 displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state}
                 self.displayPage(displayDict)
                 placeHolder = dict()
@@ -310,10 +378,9 @@ class CustomerController:
                         else:
                             state = self.navOptions(selection, state)
                 else:
-                    strDebug = 'Break with status: '+str(state)+' and selection: '+str(selection)
-                    input(strDebug)
                     print('Invalid selection, Please input again')
 
+            #create quotation request
             while state == 6:
                 # pageName = pageName
                 # userName = userName
@@ -405,6 +472,10 @@ class CustomerController:
                             print('Quotation ID {} is pending at Owner'.format(quotationObj.getQuotationId()))
                             time.sleep(2)
                             state = 7
+                        elif quotationObj.getStatus() == 'Completed':
+                            print('Booking for the Quotation ID {} is already made by you, try another Quotation ID'.format(quotationObj.getQuotationId()))
+                            time.sleep(2)
+                            state = 7
                         else:
                             print('Quotation ID {} is rejected by Owner'.format(quotationObj.getQuotationId()))
                             time.sleep(2)
@@ -438,6 +509,7 @@ class CustomerController:
                                 if paytype == '1':
                                     #create object of quotations
                                     bookingObj = Booking(bookingInfo)
+                                    Quotation.changeStatus(quotationObj.getQuotationId(), 'Completed')
                                     paymentInfo = dict()
                                     paymentInfo['paymentType'] = 'Cash'
                                     paymentInfo['paymentAmount'] = bookingInfo['bookingAmount']
@@ -450,6 +522,7 @@ class CustomerController:
                                 elif paytype == '2':
                                     couponCode = input('Please Enter the coupon code: ')
                                     bookingObj = Booking(bookingInfo)
+                                    Quotation.changeStatus(quotationObj.getQuotationId(), 'Completed')
                                     paymentInfo = dict()
                                     paymentInfo['paymentType'] = 'Cash'
                                     paymentInfo['couponCode'] = couponCode
@@ -481,7 +554,7 @@ class CustomerController:
                 if not invalidSelectionFlag:
                     if selection in pageNavDict:
                         if selection == 'B':
-                            state = 7
+                            state = 2
                         else:
                             state = self.navOptions(selection, state)
                 else:
