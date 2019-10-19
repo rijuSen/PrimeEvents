@@ -34,6 +34,7 @@ class Booking:
             for id in c.fetchone():
                 #print('reached')
                 #time.sleep(2)
+                input(id)
                 self.rowId = id
                 # strDebug = '{}{}'.format('Booking row inserted and rowId is ',id)
                 # input(strDebug)
