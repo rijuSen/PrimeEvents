@@ -3,29 +3,32 @@ import sqlite3
 from pathlib import Path
 
 class Hall:
-    '''docstring'''
-
+    """This class is the entity class of hall object
+        Attributes:
+            hallName
+            ownerId
+            dayTariff
+            hallType
+            hallAddr
+            hallCapacity
+            dbFilePath
+    """
     #class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
-    # CREATE TABLE halls (
-    #                 hallName text NOT NULL,
-    #                 ownerId int,
-    #                 dayTariff float,
-    #                 hallType text NOT NULL,
-    #                 hallAddr text NOT NULL,
-    #                 hallCapacity int NOT NULL,
-    #                 UNIQUE(hallName,ownerId),
-    #                 FOREIGN KEY(ownerId) REFERENCES users(rowid));
-
-    def insertIntoHallDb(self,hallName,ownerId,hallType,hallAddr,hallCapacity, dayTariff):
+    def insertIntoHallDb(self):
+        """This method inserts into the database the attributes of hall
+            Args:
+            Raises:
+            Returns:
+        """
         try:
             conn = sqlite3.connect(Hall.dbFileName)
             c = conn.cursor()
             with conn:
                 c.execute("INSERT INTO halls VALUES (:hallName, :ownerId, :dayTariff, :hallType, :hallAddr, :hallCapacity)",
-                        {'hallName': hallName, 'ownerId': ownerId, 'dayTariff': dayTariff, 'hallType': hallType, 'hallAddr': hallAddr, 'hallCapacity': hallCapacity})
+                        {'hallName': self.hallName, 'ownerId': self.ownerId, 'dayTariff': self.dayTariff, 'hallType': self.hallType, 'hallAddr': self.hallAddr, 'hallCapacity': self.hallCapacity})
 
-            c.execute("SELECT rowid from halls WHERE hallName = :hallName AND ownerId = :ownerId",{'hallName': hallName,'ownerId': ownerId})
+            c.execute("SELECT rowid from halls WHERE hallName = :hallName AND ownerId = :ownerId",{'hallName': self.hallName,'ownerId': self.ownerId})
             #save the rowid of the inserted row in the variable rowId
             for id in c.fetchone():
                 self.rowId = id
@@ -38,6 +41,11 @@ class Hall:
 
 
     def __init__(self,hallInfo):
+        """This is the constructor of the class hall
+            Args: Dictionary of hall details
+            Raises:
+            Returns: Object of Hall type
+        """
         if len(hallInfo) == 6:
             self.hallName = hallInfo['hallName']
             self.ownerId = hallInfo['ownerId']
@@ -50,17 +58,6 @@ class Hall:
         if len(hallInfo) == 1:
             self.rowId = hallInfo['hallId']
             row = Hall.viewHallDetails(self.rowId)
-            # CREATE TABLE halls (
-            #         hallName text NOT NULL,
-            #         ownerId int,
-            #         dayTariff float,
-            #         hallType text NOT NULL,
-            #         hallAddr text NOT NULL,
-            #         hallCapacity int NOT NULL,
-            #         UNIQUE(hallName,ownerId),
-            #         FOREIGN KEY(ownerId) REFERENCES users(rowid));
-
-            # print('Row is of type', type(row))
             self.hallName = row[1]
             self.ownerId = row[2]
             self.dayTariff = row[3]
@@ -71,7 +68,11 @@ class Hall:
 
     @classmethod
     def editHall(cls,editHallOfOwnerId,editHallName,hallName,hallType,hallAddr,hallCapacity):
-        """Except ownerId rest all attributes can be modified"""
+        """This is a class method to edit details of a hall
+            Args:
+            Raises:
+            Returns:
+        """
         conn = sqlite3.connect(self.dbFileName)
         c = conn.cursor()
         try:
@@ -108,6 +109,11 @@ class Hall:
 
     @classmethod
     def viewAllHalls(cls):
+        """This method lists all halls in the database
+            Args:
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid,* FROM halls")
@@ -119,6 +125,11 @@ class Hall:
 
     @classmethod
     def viewUserHalls(cls, userObj):
+        """This is a class method returns list of owner halls
+            Args: Object of User type
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
         ownerId = userObj.getRowId()
@@ -129,6 +140,11 @@ class Hall:
 
     @classmethod
     def viewHallDetails(cls,rowId):
+        """This is a class method returns hall details
+            Args: rowid
+            Raises:
+            Returns: tuples of hall details
+        """
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
         c.execute("""SELECT rowid, * FROM halls WHERE rowid = :rowId""",{'rowId' : rowId, })
@@ -141,6 +157,11 @@ class Hall:
 
     @classmethod
     def hallExists(cls, hallName, userObj):
+        """This is a class method returns list of owner halls
+            Args: Object of User type
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
         ownerId = userObj.getRowId()
@@ -153,6 +174,11 @@ class Hall:
 
     @classmethod
     def deletehall(cls,rowId):
+        """This is a class method returns list of owner halls
+            Args: Object of User type
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
         with conn:
@@ -166,6 +192,11 @@ class Hall:
 
     @classmethod
     def modifyhall(cls,rowId, hallInfo):
+        """This is a class method returns list of owner halls
+            Args: Object of User type
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Hall.dbFileName)
         c = conn.cursor()
         with conn:

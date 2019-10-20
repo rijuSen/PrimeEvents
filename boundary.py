@@ -245,16 +245,9 @@ class Boundary:
                 # userName = userName
                 optionDisplay = {'L': 'Login', 'O': 'Register as Owner', 'C': 'Register as Customer'}
                 pageNavDict = {'E': 'Exit'}
-                # message = message
-                # state = state
-                # headerDisplay = headerDisplay
                 os.system('clear')
-                # landingPage = {'L': 'Login', 'O': 'Register as Owner', 'C': 'Register as Customer'}
-                # navPageDict = {'E': 'Exit'}
-                # userNamePlaceHolder = ''
                 displayDict = {'pageName': pageName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict}
                 self.displayPage(displayDict)
-                # self.displayPage('Login Page', userNamePlaceHolder, landingPage, pageNavDict)
                 invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
                 if not invalidSelectionFlag:
                     if selection == 'O':
@@ -265,12 +258,6 @@ class Boundary:
                         else:
                             userObj = Owner(userInfo)
                             state = 2
-                            print('User info is {}'.format(userInfo))
-                            print('State is {} and session ID is {} and user type is {}'.format(state,
-                                                                                                userObj.getRowId(),
-                                                                                                userObj.getUserType()))
-                            time.sleep(2)
-                            # print(owner.getRowId())
                     elif selection == 'C':
                         mailExistFlag, userInfo = self.acceptUserDetails()
                         # create a user object

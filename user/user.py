@@ -4,38 +4,30 @@ from pathlib import Path
 
 
 class User:
-    '''docstring'''
+    """This class is the entity class for all users of the system
+        Args:
+        Raises:
+        Returns:
+    """
     # class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
 
-    def insertIntoUserDb(self, firstName, lastName, email, password, userType, allowFlag):
-        ''' Function needs arguments --> firstName,lastName,email,password,userType,allowFlag'''
+    def insertIntoUserDb(self):
+        """This method inserts into the database the attributes of user
+            Args:
+            Raises:
+            Returns:
+        """
         self.userDbFilePath = Path(User.dbFileName)
-        # check if database file already exists
-        if not self.userDbFilePath.is_file():
-            conn = sqlite3.connect(User.dbFileName)
-            c = conn.cursor()
-            c.execute("""CREATE TABLE users (
-                        firstName text NOT NULL,
-                        lastName text NOT NULL,
-                        email text NOT NULL UNIQUE,
-                        password text NOT NULL,
-                        userType text NOT NULL,
-                        allowFlag int DEFAULT 0,
-                        UNIQUE(email))
-                        """)
-            conn.close()
-
         # insert entry into database
         try:
             conn = sqlite3.connect(User.dbFileName)
             c = conn.cursor()
             with conn:
                 c.execute("INSERT INTO users VALUES (:firstName, :lastName, :email, :password, :userType, :allowFlag)",
-                          {'firstName': firstName, 'lastName': lastName, 'email': email, 'password': password,
-                           'userType': userType, 'allowFlag': allowFlag})
-            c.execute("SELECT rowid from users WHERE email = :email", {'email': email, })
-
+                          {'firstName': self.firstName, 'lastName': self.lastName, 'email': self.email, 'password': self.password,
+                           'userType': self.userType, 'allowFlag': self.allowFlag})
+            c.execute("SELECT rowid from users WHERE email = :email", {'email': self.email, })
             # save the rowid of the inserted row in the variable rowId
             for id in c.fetchone():
                 self.rowId = id
@@ -46,6 +38,12 @@ class User:
             conn.close()
 
     def checkPassword(self, userInfo):
+        """This method contains all functionality related to the customer along with the flow
+            Args:
+                - userInfo -- Dictionary of user email and password hash
+            Raises:
+            Returns: user entry
+        """
         email = userInfo['email']
         password = userInfo['password']
         conn = sqlite3.connect(self.dbFileName)
@@ -59,6 +57,12 @@ class User:
     # def __init__(self,firstName,lastName,email,password,userType):
 
     def __init__(self, userInfo):
+        """This is the constructor method of class User
+            Args:
+                - userInfo -- Dictionary of user details
+            Raises:
+            Returns: object of type User
+        """
         # create a new entry in the DB
         if len(userInfo) == 5:
             self.firstName = userInfo['firstName']
@@ -67,8 +71,7 @@ class User:
             self.password = userInfo['password']
             self.userType = userInfo['userType']
             self.allowFlag = 0
-            self.insertIntoUserDb(self.firstName, self.lastName, self.email, self.password, self.userType,
-                                  self.allowFlag)
+            self.insertIntoUserDb()
             self.success = True
         # create an object of an existing entry
         if len(userInfo) == 2:
@@ -118,7 +121,15 @@ class User:
 
     @classmethod
     def editUser(cls, editEntryWithEmail, firstName, lastName, password):
-        """Only first name, last name and password can be modified"""
+        """This class method modifies user details
+            Args:
+                - editEntryWithEmail - email address of the entry to be modified
+                - firstName - new first name
+                - lastName - new last name
+                - password - new password hash
+            Raises:
+            Returns:
+        """
         conn = sqlite3.connect(self.dbFileName)
         c = conn.cursor()
         try:
@@ -133,6 +144,12 @@ class User:
 
     @classmethod
     def emailExists(cls, email):
+        """This class method checks if a email address is already registered on the platform
+            Args:
+                - email - email address
+            Raises:
+            Returns: Boolean
+        """
         conn = sqlite3.connect(cls.dbFileName)
         c = conn.cursor()
         c.execute("SELECT count(*) FROM users WHERE email = :email", {'email': email, })
@@ -141,17 +158,6 @@ class User:
             return False
         else:
             return True
-
-
-#    @classmethod
-#    def displayEntry(cls,email):
-#        conn = sqlite3.connect(cls.dbFileName)
-#        c = conn.cursor()
-#        c.execute("SELECT firstName, lastName, email,  from users WHERE email = :email",{'email': email,})
-#        for column in c.fetchone():
-
-# take a mail id and password and return a user object
-
 
 class Owner(User):
     '''Owner class extending User'''
@@ -207,16 +213,8 @@ class Admin(User):
         c = conn.cursor()
         try:
             with conn:
-                # c.execute("SELECT last_insert_rowid()")
-                # print(c.fetchall())
                 c.execute("""UPDATE users SET allowFlag = :allowFlag WHERE rowid = :rowid""",
                           {'allowFlag': 1, 'rowid': rowid})
-                # print(c.fetchone())
-                # if 'None' in str(c.fetchone()):
-                #   print('Id:',rowid,'is not present in the database')
-            # else:
-            #    c.execute("SELECT rowid,* FROM users WHERE rowid = :rowid",{'rowid': rowid,})
-            #   print(c.fetchone())
         except sqlite3.Error as sqlite3Error:
             print("SQLite3 Error -->", sqlite3Error)
         finally:
@@ -227,16 +225,8 @@ class Admin(User):
         c = conn.cursor()
         try:
             with conn:
-                # c.execute("SELECT last_insert_rowid()")
-                # print(c.fetchall())
                 c.execute("""UPDATE users SET allowFlag = :allowFlag WHERE rowid = :rowid""",
                           {'allowFlag': 0, 'rowid': rowid})
-                # print(c.fetchone())
-                # if 'None' in str(c.fetchone()):
-                #   print('Id:',rowid,'is not present in the database')
-            # else:
-            #    c.execute("SELECT rowid,* FROM users WHERE rowid = :rowid",{'rowid': rowid,})
-            #   print(c.fetchone())
         except sqlite3.Error as sqlite3Error:
             print("SQLite3 Error -->", sqlite3Error)
         finally:

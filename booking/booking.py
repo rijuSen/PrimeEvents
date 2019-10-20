@@ -5,26 +5,22 @@ import datetime
 from pathlib import Path
 
 class Booking:
-    '''docstring'''
-
+    """This class is the entity class for all bookings of the system
+        Args:
+        Raises:
+        Returns:
+    """
     #class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
     def insertIntoBookingDb(self):
+        """This method inserts into the database the attributes of a booking
+            Args:
+            Raises:
+            Returns:
+        """
         try:
             conn = sqlite3.connect(Booking.dbFileName)
             c = conn.cursor()
-# CREATE TABLE bookings (
-#                   bookingStartDate date NOT NULL,
-#                   bookingEndDate date NOT NULL,
-#                   hallId int NOT NULL,
-#                   customerId int NOT NULL,
-#                   status boolean NOT NULL,
-#                   bookingAmount float NOT NULL,
-#                   quotationId int NOT NULL,
-#                   UNIQUE(quotationId),
-#                   FOREIGN KEY(customerId) REFERENCES users(rowid),
-#                   FOREIGN KEY(quotationId) REFERENCES quotations(rowid),
-#                   FOREIGN KEY(hallId) REFERENCES halls(rowid));
             with conn:
                 c.execute("INSERT INTO Bookings VALUES (:bookingStartDate, :bookingEndDate, :hallId, :customerId, :status, :bookingAmount, :quotationId, NULL)",
                         { 'bookingStartDate': self.bookingStartDate, 'bookingEndDate': self.bookingEndDate, 'hallId': self.hallId, 'customerId': self.customerId, 'status': self.status, 'bookingAmount': self.bookingAmount, 'quotationId': self.quotationId})
@@ -47,6 +43,11 @@ class Booking:
 
 
     def getBookingDetails(self):
+        """This method fetches booking details from the database
+            Args:
+            Raises:
+            Returns: tuple - a booking entry
+        """
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
         c.execute("""SELECT rowid, * FROM bookings WHERE quotationId = :quotationId""",{'quotationId' : self.quotationId, })
@@ -55,7 +56,11 @@ class Booking:
         return output
 
     def __init__(self,bookingInfo):
-        """bookingInfo['bookingStartDate','bookingEndDate','hallId','customerId','bookingAmount','quotationId']"""
+        """This is the constructor of the class booking
+            Args: Dictionary of booking details
+            Raises:
+            Returns: Object of Booking
+        """
         if len(bookingInfo) == 6:
             self.bookingStartDate = bookingInfo['bookingStartDate']
             self.bookingEndDate = bookingInfo['bookingEndDate']
@@ -78,6 +83,11 @@ class Booking:
 
 
     def completeBooking(self):
+        """This method changes the status of the booking to complete
+            Args:
+            Raises:
+            Returns:
+        """
         self.status = 'Completed'
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
@@ -89,21 +99,13 @@ class Booking:
         finally:
             conn.close()
 
-    # @classmethod
-    # def checkHallAvailability(cls, hallObj, startDate, endDate):
-    #     listOfBookings = Booking.viewAllBookings()
-    #     hallId = hallObj.getHallId()
-    #     for bookingRow in listOfBookings:
-    #         if bookingRow[0] == hallId:
-    #             if startDate >= bookingRow[1] and endDate <= bookingRow[2]:
-    #                 return False
-    #     else:
-    #         return True
-
-
     @classmethod
     def editBooking(cls,editBookingInfo):
-        """Except bookingEndDate rest all attributes can be modified"""
+        """This is a class method to edit a booking entry
+            Args: Dictionary of booking details to be modified
+            Raises:
+            Returns:
+        """
         editBookingOfbookingEndDate = editBookingInfo['editBookingOfbookingEndDate']
         editbookingStartDate = editBookingInfo['editbookingStartDate']
         bookingStartDate = editBookingInfo['bookingStartDate']
@@ -121,6 +123,11 @@ class Booking:
             conn.close()
 
     def completeBooking(self):
+        """This method changes the status of the booking to complete
+            Args:
+            Raises:
+            Returns:
+        """
         self.status = 'Completed'
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
@@ -152,6 +159,11 @@ class Booking:
         return self.bookingAmount
 
     def addPaymentInfo(self, paymentId):
+        """This method adds payment details to the booking
+            Args: paymentId
+            Raises:
+            Returns:
+        """
         self.paymentId = paymentId
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
@@ -165,17 +177,25 @@ class Booking:
 
     @classmethod
     def viewAllBookings(cls):
+        """This is a class method that returns a list of all bookings
+            Args:
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid,* FROM Bookings")
         output = c.fetchall()
-        #print(output)
-        #print(type(output))
         conn.close()
         return output
 
     @classmethod
     def viewUserBookings(cls, userObj):
+        """This is a class method that returns a list of all bookings of a specific user
+            Args:
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid,* from Bookings WHERE customerId = :customerId",{'customerId': userObj.getRowId(),})
@@ -185,17 +205,25 @@ class Booking:
 
     @classmethod
     def viewBookingDetails(cls,rowId):
+        """This is a class method returns booking details
+            Args:
+            Raises:
+            Returns: tuples containing details
+        """
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
         c.execute("""SELECT rowid, * FROM Bookings WHERE rowid = :rowId""",{'rowId' : rowId, })
         output = c.fetchone()
-        #print(output)
-        #print(type(output))
         conn.close()
         return output
 
     @classmethod
     def listOwnerBookings(cls, ownerId):
+        """This is a class method that returns a list of all bookings of a specific owner
+            Args:
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid, * FROM Bookings WHERE hallId IN" +
@@ -206,6 +234,11 @@ class Booking:
 
     @classmethod
     def changeStatus(self, rowId, status):
+        """This is a class method that returns a list of all bookings
+            Args:
+            Raises:
+            Returns: list of tuples
+        """
         self.status = status
         """Only first name, last name and password can be modified"""
         conn = sqlite3.connect(Booking.dbFileName)
@@ -222,6 +255,11 @@ class Booking:
 
     @classmethod
     def getOwnerBookingIds(cls, ownerId):
+        """This is a class method that returns a list of all bookings of a specific owner
+            Args:
+            Raises:
+            Returns: list of tuples
+        """
         conn = sqlite3.connect(Booking.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid FROM Bookings WHERE hallId IN" +
