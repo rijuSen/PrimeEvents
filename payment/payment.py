@@ -19,7 +19,6 @@ class Payment:
         try:
             conn = sqlite3.connect(Payment.dbFileName)
             c = conn.cursor()
-            print('Log point 2')
             with conn:
                 c.execute("INSERT INTO payments VALUES (:paymentType, :paymentCoupon, :paymentAmount, :paymentStatus, :bookingId, :customerId)",
                           {'paymentType': self.paymentType, 'paymentCoupon': self.paymentCoupon,'paymentAmount': self.paymentAmount, 'paymentStatus': self.paymentStatus, 'bookingId': self.bookingId, 'customerId': self.customerId})
@@ -52,7 +51,6 @@ class Payment:
             self.bookingId = quoDict['bookingId']
             self.customerId = quoDict['customerId']
             self.paymentCoupon = 'NULL'
-            print('Pass dictionary', quoDict)
             self.insertIntoPaymentDb()
         if len(quoDict) == 5:
             # check if database file already exists
@@ -62,7 +60,6 @@ class Payment:
             self.paymentStatus = 'Pending'
             self.bookingId = quoDict['bookingId']
             self.customerId = quoDict['customerId']
-            print('Pass dictionary', quoDict)
             self.insertIntoPaymentDb()
         elif len(quoDict) == 1:
             self.rowId = quoDict['paymentId']

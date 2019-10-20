@@ -42,7 +42,6 @@ class Quotation:
         try:
             conn = sqlite3.connect(Quotation.dbFileName)
             c = conn.cursor()
-            print('Log point 2')
             with conn:
                 c.execute("INSERT INTO quotations VALUES (:reqDate, :bookingStartDate, :bookingEndDate, :hallId, :customerId, :status, :quotationAmount)",
                           {'reqDate': self.reqDate, 'bookingStartDate': self.bookingStartDate, 'bookingEndDate': self.bookingEndDate, 'hallId': self.hallId, 'customerId': self.customerId, 'status': self.status, 'quotationAmount': self.quotationAmount })
@@ -119,7 +118,6 @@ class Quotation:
             self.quotationAmount = quoDict['quotationAmount']
             self.bookingStartDate = quoDict['bookingStartDate']
             self.bookingEndDate = quoDict['bookingEndDate']
-            print('Pass dictionary',quoDict)
             # input('breakpoint')
 
             self.insertIntoUserDb()

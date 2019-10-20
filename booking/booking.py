@@ -28,12 +28,7 @@ class Booking:
             #save the rowid of the inserted row in the variable rowId
             time.sleep(2)
             for id in c.fetchone():
-                #print('reached')
-                #time.sleep(2)
-                input(id)
                 self.rowId = id
-                # strDebug = '{}{}'.format('Booking row inserted and rowId is ',id)
-                # input(strDebug)
             self.success = True
         except sqlite3.Error as sqlite3Error:
             self.success = False
