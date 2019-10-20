@@ -209,6 +209,8 @@ class CustomerController:
                 return False, errorInfo
             except TypeError as errorInfo:
                 return False, errorInfo
+            except IndexError as errorInfo:
+                return False, errorInfo
         else:
             try:
                 dateStr = input('Enter end date of booking (DD/MM/YYYY): ')
@@ -298,7 +300,8 @@ class CustomerController:
                 userName = userObj.getFirstName()
                 optionDisplay = Hall.viewAllHalls()
                 pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state}
+                headerDisplay = 'Select ID to view detail and request quotation'
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state, 'headerDisplay': headerDisplay}
                 self.displayPage(displayDict)
                 invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
                 if not invalidSelectionFlag:
@@ -325,42 +328,47 @@ class CustomerController:
                         break
                     else:
                         dateCounter = dateCounter - 1
+                        # input(str(dateCounter))
                         print(dateObj,', please try again')
                 else:
                     print('Maximum retry reached, navigating back')
-                    state = self.navOptions('B', state)
+                    time.sleep(3)
+                    state = 2
                 #accept date from user for booking end date
-                dateCounter = 3
-                while dateCounter > 0:
-                    dateFlag, dateObj = self.acceptDate(startDate)
-                    if dateFlag:
-                        endDate = dateObj
-                        break
-                    else:
-                        dateCounter = dateCounter - 1
-                        print(dateObj,', please try again')
-                else:
-                    print('Maximum retry reached, navigating back')
-                    state = self.navOptions('B', state)
-                pageName = "Halls available on selected dates"
-                userName = userObj.getFirstName()
-                optionDisplay = self.getAvailableHalls(startDate, endDate)
-                pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-                headerDisplay = "Input ID to proceed to ask for quotation"
-                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay}
-                self.displayPage(displayDict)
-                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
-                if not invalidSelectionFlag:
-                    if selection in pageNavDict:
-                        if selection == 'B':
-                            state = 2
+                if dateFlag:
+                    dateCounter = 3
+                    while dateCounter > 0:
+                        dateFlag, dateObj = self.acceptDate(startDate)
+                        if dateFlag:
+                            endDate = dateObj
+                            break
                         else:
-                            state = self.navOptions(selection, state)
+                            dateCounter = dateCounter - 1
+                            print(dateObj,', please try again')
                     else:
-                        state = 5
-                        index = selection
-                else:
-                    print('Invalid selection, Please input again')
+                        print('Maximum retry reached, navigating back')
+                        time.sleep(3)
+                        state = 2
+                    if dateFlag:
+                        pageName = "Halls available on selected dates"
+                        userName = userObj.getFirstName()
+                        optionDisplay = self.getAvailableHalls(startDate, endDate)
+                        pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
+                        headerDisplay = "Input ID to view hall details and request quotation"
+                        displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay}
+                        self.displayPage(displayDict)
+                        invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
+                        if not invalidSelectionFlag:
+                            if selection in pageNavDict:
+                                if selection == 'B':
+                                    state = 2
+                                else:
+                                    state = self.navOptions(selection, state)
+                            else:
+                                state = 5
+                                index = selection
+                        else:
+                            print('Invalid selection, Please input again')
 
             #intermediary state not to be jumped onto
             while state == 5:
@@ -405,51 +413,54 @@ class CustomerController:
                         break
                     else:
                         dateCounter = dateCounter - 1
+                        input(str(dateCounter))
                         print(dateObj,', please try again')
                 else:
                     print('Maximum retry reached, navigating back')
-                    state = self.navOptions('B', state)
+                    state = 5
                 #accept date from user for booking end date
-                dateCounter = 3
-                while dateCounter > 0:
-                    dateFlag, dateObj = self.acceptDate(quotationInfo['bookingStartDate'])
-                    if dateFlag:
-                        quotationInfo['bookingEndDate'] = dateObj
-                        break
-                    else:
-                        dateCounter = dateCounter - 1
-                        print(dateObj,', please try again')
-                else:
-                    print('Maximum retry reached, navigating back')
-                    state = self.navOptions('B', state)
-                quotationInfo['hallId'] = index
-                quotationInfo['customerId'] = userObj.getRowId()
-                quotationInfo['quotationAmount'] = self.calculateQuote(quotationInfo['bookingStartDate'], quotationInfo['bookingEndDate'], quotationInfo['hallId'])
-                print('Charge for booking from {} to {} is {}.'.format(quotationInfo['bookingStartDate'].isoformat(),quotationInfo['bookingEndDate'].isoformat(),quotationInfo['quotationAmount']))
-                customerConfirmCounter = 3
-                while customerConfirmCounter > 0:
-                    confirmation = input('Confirm Quotation Request(Y/N): ')
-                    if confirmation.isalpha():
-                        if confirmation.lower() == 'y':
-                            #create object of quotations
-                            quotationObj = Quotation(quotationInfo)
-                            state = 7
-                            break
-                        elif confirmation.lower() == 'n':
-                            print('Taking back to previous menu')
-                            time.sleep(2)
-                            state = 5
+                if dateFlag:
+                    dateCounter = 3
+                    while dateCounter > 0:
+                        dateFlag, dateObj = self.acceptDate(quotationInfo['bookingStartDate'])
+                        if dateFlag:
+                            quotationInfo['bookingEndDate'] = dateObj
                             break
                         else:
-                            print('Invalid input!! Try again')
-                            customerConfirmCounter = customerConfirmCounter - 1
+                            dateCounter = dateCounter - 1
+                            print(dateObj,', please try again')
                     else:
-                        print('Invalid input!! Try again')
-                        customerConfirmCounter = customerConfirmCounter - 1
-                if customerConfirmCounter == 0:
-                    print('Maximum Taking back to previous menu')
-                    time.sleep(2)
-                    state = 5
+                        print('Maximum retry reached, navigating back')
+                        state = 5
+                    if dateFlag:
+                        quotationInfo['hallId'] = index
+                        quotationInfo['customerId'] = userObj.getRowId()
+                        quotationInfo['quotationAmount'] = self.calculateQuote(quotationInfo['bookingStartDate'], quotationInfo['bookingEndDate'], quotationInfo['hallId'])
+                        print('Charge for booking from {} to {} is {}.'.format(quotationInfo['bookingStartDate'].isoformat(),quotationInfo['bookingEndDate'].isoformat(),quotationInfo['quotationAmount']))
+                        customerConfirmCounter = 3
+                        while customerConfirmCounter > 0:
+                            confirmation = input('Confirm Quotation Request(Y/N): ')
+                            if confirmation.isalpha():
+                                if confirmation.lower() == 'y':
+                                    #create object of quotations
+                                    quotationObj = Quotation(quotationInfo)
+                                    state = 7
+                                    break
+                                elif confirmation.lower() == 'n':
+                                    print('Taking back to previous menu')
+                                    time.sleep(2)
+                                    state = 5
+                                    break
+                                else:
+                                    print('Invalid input!! Try again')
+                                    customerConfirmCounter = customerConfirmCounter - 1
+                            else:
+                                print('Invalid input!! Try again')
+                                customerConfirmCounter = customerConfirmCounter - 1
+                        if customerConfirmCounter == 0:
+                            print('Maximum Taking back to previous menu')
+                            time.sleep(2)
+                            state = 5
 
             #display all quotation requests made by the customer
             while state == 7:
