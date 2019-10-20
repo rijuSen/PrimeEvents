@@ -3,9 +3,19 @@ import sqlite3
 from pathlib import Path
 
 class Payment:
+    """The Payment object contains information about payment
+    Args:
+    Attributes:
+    """
+
     dbFileName = "databaseFiles/primeEventsDb.db"
 
     def insertIntoPaymentDb(self):
+        """This function adds a new payment information into the Database
+            Args:
+            Raises:
+            Returns:
+        """
         try:
             conn = sqlite3.connect(Payment.dbFileName)
             c = conn.cursor()
@@ -23,7 +33,17 @@ class Payment:
             print("SQLite3 Error : -->", sqlite3Error)
 
     def __init__(self, quoDict):
-        """quoDict['paymentType', 'couponCode', 'paymentAmount', 'bookingId', 'customerId']"""
+        """This is a constructor for payment class
+            Args:
+                - quoDict -- dictionary
+                    paymentType
+                    couponCode
+                    paymentAmount
+                    bookingId
+                    customerId
+            Raises:
+            Returns:
+        """
         if len(quoDict) == 4:
             # check if database file already exists
             self.paymentType = quoDict['paymentType']
@@ -53,18 +73,16 @@ class Payment:
     def getRowId(self):
         return self.rowId
 
-    def getPaymentId(self):
-        #get payment id from database
-        pass
-
-    def generatePaymentId(self):
-        #fetch the next available payment id from the database
-        pass
-
     @classmethod
     def changeStatus(self, paymentId, status):
+        """This is a function to change payment status
+            Args:
+                - paymentId -- int - payment ID whose status is to be changed
+                - status -- string - new status to be updated
+            Raises:
+            Returns:
+        """
         self.paymentStatus = status
-        """Only first name, last name and password can be modified"""
         conn = sqlite3.connect(Payment.dbFileName)
         c = conn.cursor()
         try:
@@ -79,6 +97,19 @@ class Payment:
 
     @classmethod
     def listOwnerPaymentRequests(cls, ownerId):
+        """This is a function which returns all the payment info for an owner
+            Args:
+                - ownerId -- int - owner ID of the user whose payment info is to be retrieved
+            Raises:
+            Returns:
+                - list of paymentInfo -- dictionary
+                    paymentId
+                    paymnetType
+                    couponCode
+                    paymentStatus
+                    paymentAmount
+                    bookingId
+        """
         conn = sqlite3.connect(Payment.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid, * FROM payments WHERE bookingId IN" +
@@ -90,6 +121,19 @@ class Payment:
 
     @classmethod
     def viewPaymentDetails(cls,rowId):
+        """This is a function which returns payment info for a particular payment Id
+            Args:
+                - rowId -- int - paymnet ID whose details is to be retrieved
+            Raises:
+            Returns:
+                - paymentInfo -- dictionary
+                    paymentId
+                    paymnetType
+                    couponCode
+                    paymentStatus
+                    paymentAmount
+                    bookingId
+        """
         conn = sqlite3.connect(Payment.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid, * FROM payments WHERE rowid = :rowId",{'rowId': rowId,})
