@@ -23,7 +23,7 @@ class Payment:
             print("SQLite3 Error : -->", sqlite3Error)
 
     def __init__(self, quoDict):
-        """docstring"""
+        """quoDict['paymentType', 'couponCode', 'paymentAmount', 'bookingId', 'customerId']"""
         if len(quoDict) == 4:
             # check if database file already exists
             self.paymentType = quoDict['paymentType']
@@ -45,7 +45,6 @@ class Payment:
             print('Pass dictionary', quoDict)
             self.insertIntoPaymentDb()
         elif len(quoDict) == 1:
-
             self.rowId = quoDict['paymentId']
 
     def getPaymentType(self):

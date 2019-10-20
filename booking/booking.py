@@ -102,8 +102,14 @@ class Booking:
 
 
     @classmethod
-    def editBooking(cls,editBookingOfbookingEndDate,editbookingStartDate,bookingStartDate,customerId,status,bookingAmount):
+    def editBooking(cls,editBookingInfo):
         """Except bookingEndDate rest all attributes can be modified"""
+        editBookingOfbookingEndDate = editBookingInfo['editBookingOfbookingEndDate']
+        editbookingStartDate = editBookingInfo['editbookingStartDate']
+        bookingStartDate = editBookingInfo['bookingStartDate']
+        customerId = editBookingInfo['customerId']
+        status = editBookingInfo['status']
+        bookingAmount = editBookingInfo['bookingAmount']
         conn = sqlite3.connect(self.dbFileName)
         c = conn.cursor()
         try:

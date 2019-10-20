@@ -17,20 +17,12 @@ class OwnerController:
         return self.state
 
     def displayPage(self, inputDict):
-        """
-        if userName exists then will be displayed on self.selectOption
-        if optionDisplay exists then display
-        if optionDisplay is a dict display as dict
-        if optionDisplay is a list display as list
-        {'pageName':, 'userName': , 'optionDisplay':, 'pageNavDict': , 'footerDisplay': , 'state': , 'headerDisplay': }
-        pageName = inputDict['pageName']
-        userName = inputDict['userName']
-        optionDisplay = inputDict['optionDisplay']
-        pageNavDict = inputDict['pageNavDict']
-        footerDisplay = inputDict['footerDisplay']
-        state = inputDict['state']
-        headerDisplay = inputDict['headerDisplay']
-        {'pageName': pageName = None, 'userName': userName = None, 'optionDisplay': optionDisplay = None, 'pageNavDict': pageNavDict = None, 'state': state}
+        """This is the only function which will display on the Screen
+            Args:
+                - inputDict -- a dictionary with keys {'pageName', 'userName', 'optionDisplay', 'pageNavDict', 'footerDisplay', 'state', 'headerDisplay'}
+                    pageName is mandatory and rest all are optional
+            Raises:
+            Returns:
         """
         os.system('clear')
         # Display Page Name
@@ -92,10 +84,10 @@ class OwnerController:
                 print('-' * 105)
                 # navigation panel
             elif isinstance(inputDict['optionDisplay'], list):
-                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format('Key', 'Venue', 'Type', 'Addr', 'Capacity'))
+                tableHeader = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^20}{5:^15}".format('ID', 'Venue', 'Tariff/Day', 'Type', 'Addr', 'Capacity'))
                 print("{0:^105}".format(tableHeader))
                 for row in inputDict['optionDisplay']:
-                    rowWise = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^15}".format(row[0], row[1], row[3], row[4], row[5]))
+                    rowWise = ("{0:^5}{1:^15}{2:^15}{3:^15}{4:^20}{5:^15}".format(row[0], row[1], row[3], row[4], row[5], row[6]))
                     print('{:^105}'.format(rowWise))
                 print('-' * 105)
                 # navigation panel
@@ -137,10 +129,16 @@ class OwnerController:
             print('-' * 105)
 
     def selectOption(self, optionDisplay, pageNavDict):
-        """
-        selection made is from either dictionary keys or list indices
-        return true and null string if invalid selection made and
-        return false and selection in appropriate format if valid selection is made
+        """This function allows selection to be made from either dictionary keys or list indices provided as arguments
+            Args:
+                - optionDisplay -- a dictionary or a list
+                - pageNavDict -- a dictionary
+            Raises:
+            Returns:
+                - success -- boolean
+                    true if invalid selection made
+                    false if valid selection is made
+                - state -- int
         """
         # prompt user to select option
         selection = input('Enter your selection: ')
@@ -168,10 +166,13 @@ class OwnerController:
             return True, ''
 
     def navOptions(self, selection, state):
-        """
-
-        :param selection:
-        :type state: object
+        """This function returns the state necessary to Logout or Exit
+            Args:
+                - selection -- string
+                - state -- int
+            Raises:
+            Returns:
+                - state -- int
         """
         if selection == 'O':
             state = 1
@@ -180,6 +181,22 @@ class OwnerController:
         return state
 
     def acceptHallDetails(self, userObj):
+        """This function handles Hall registration
+            Args:
+                - userObj -- User
+            Raises:
+            Returns:
+                - hallExistFlag -- boolean
+                    true if hall name already exists in the system for the same user
+                    false if hall name doesn't exist and can be used
+                - hallInfo -- dictionary
+                    hallName
+                    dayTariff
+                    hallType
+                    hallAddr
+                    hallCapacity
+                    ownerId
+        """
         os.system('clear')
         print('=' * 65)
         print('{:^65}'.format('New Hall Page'))
@@ -205,6 +222,23 @@ class OwnerController:
         return hallExistFlag, hallInfo
 
     def acceptModifyHallDetails(self, userObj, optionDisplay):
+        """This function handles Hall registration
+            Args:
+                - userObj -- User
+                - optionDisplay -- Tuple contaning hall info which is to be modified
+            Raises:
+            Returns:
+                - hallExistFlag -- boolean
+                    true if hall name already exists in the system for the same user
+                    false if hall name doesn't exist and can be used
+                - hallInfo -- dictionary - updated
+                    hallName
+                    dayTariff
+                    hallType
+                    hallAddr
+                    hallCapacity
+                    ownerId
+        """
         os.system('clear')
         print('=' * 65)
         print('{:^65}'.format('Modify Hall Page'))
@@ -219,7 +253,10 @@ class OwnerController:
         retryCount = 0
         while hallExistFlag and retryCount < 3:
             hallInfo['hallName'] = input('Enter new Hall Name: ')
-            hallExistFlag = Hall.hallExists(hallInfo['hallName'], userObj)
+            if optionDisplay[1] != hallInfo['hallName']:
+                hallExistFlag = Hall.hallExists(hallInfo['hallName'], userObj)
+            else:
+                hallExistFlag = False
             retryCount = retryCount + 1
             if hallExistFlag == True and retryCount < 3:
                 print("Hall already exists, try another Hall name")
@@ -236,7 +273,11 @@ class OwnerController:
 
     def ownerController(self, userObj):
         """
-        This method contains all functionalities related to owner
+        This method contains all functionality related to the owner along with the flow
+            Args:
+                - userObj -- User
+            Raises:
+            Returns:
         """
         state = 2
         while state >= 2:
@@ -395,15 +436,20 @@ class OwnerController:
                             state = 5
                         if selection == 'M':
                             newAmount = input('Enter New Quotation Amount: ')
-                            confirmation = input('Confirm Modification Request(Y/N): ')
-                            if confirmation.isalpha():
-                                if confirmation.lower() == 'y':
-                                    #create object of quotations
-                                    Quotation.changeAmount(optionDisplay[0], newAmount)
-                                elif confirmation.lower() == 'n':
-                                    print('Taking back to previous menu')
-                                    time.sleep(1)
-                                state = 5
+                            if newAmount.isdigit():
+                                confirmation = input('Confirm Modification Request(Y/N): ')
+                                if confirmation.isalpha():
+                                    if confirmation.lower() == 'y':
+                                        #create object of quotations
+                                        Quotation.changeAmount(optionDisplay[0], newAmount)
+                                    elif confirmation.lower() == 'n':
+                                        print('Taking back to previous menu')
+                                        time.sleep(1)
+                                    state = 5
+                            else:
+                             print('Please enter a valid value[float only]')
+                             selection = index
+                             time.sleep(1)
                         elif selection == 'A':
                             confirmation = input('Confirm Accept Request(Y/N): ')
                             if confirmation.isalpha():
