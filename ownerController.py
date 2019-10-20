@@ -58,7 +58,7 @@ class OwnerController:
                 print('-' * 105)
                 # navigation panel
             elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 5:
-                tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('Key', 'Start-Date', 'End-Date','Venue', 'Customer', 'Status','Amount'))
+                tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('ID', 'Start-Date', 'End-Date','Venue', 'Customer', 'Status','Amount'))
                 print("{0:^105}".format(tableHeader))
                 # for value in optionDisplay:
                 for tup in inputDict['optionDisplay']:
@@ -67,7 +67,7 @@ class OwnerController:
                 print('-' * 105)
 
             elif isinstance(inputDict['optionDisplay'], list) and 'state' in inputDict.keys() and inputDict['state'] == 8:
-                tableHeader = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format('Key', 'Booking ID', 'Type', 'Amount', 'Customer', 'Coupon Code', 'Status'))
+                tableHeader = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format('ID', 'Booking ID', 'Type', 'Amount', 'Customer', 'Coupon Code', 'Status'))
                 print("{0:^105}".format(tableHeader))
                 # for value in optionDisplay:
                 for tup in inputDict['optionDisplay']:
@@ -101,7 +101,7 @@ class OwnerController:
                 print('-' * 105)
 
             elif isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 6:
-                tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('Key', 'StartDate', 'EndDate','Venue', 'Customer', 'Status','Amount'))
+                tableHeader = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format('ID', 'StartDate', 'EndDate','Venue', 'Customer', 'Status','Amount'))
                 print("{0:^105}".format(tableHeader))
                 # for value in optionDisplay:
                 tempString = ("{0:^5}{1:^30}{2:^20}{3:^20}{4:^10}{5:^10}{6:^10}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][1], inputDict['optionDisplay'][2], inputDict['optionDisplay'][3], inputDict['optionDisplay'][4], inputDict['optionDisplay'][5], inputDict['optionDisplay'][6]))
@@ -109,7 +109,7 @@ class OwnerController:
                 print('-' * 105)
 
             elif isinstance(inputDict['optionDisplay'], tuple) and inputDict['state'] == 9:
-                tableHeader = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format('Key', 'Booking ID', 'Type', 'Amount', 'Customer', 'Coupon Code', 'Status'))
+                tableHeader = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format('ID', 'Booking ID', 'Type', 'Amount', 'Customer', 'Coupon Code', 'Status'))
                 print("{0:^105}".format(tableHeader))
                 # for value in optionDisplay:
                 tempString = ("{0:^5}{1:^10}{2:^20}{3:^10}{4:^10}{5:^20}{6:^20}".format(inputDict['optionDisplay'][0], inputDict['optionDisplay'][5], inputDict['optionDisplay'][1], inputDict['optionDisplay'][3], inputDict['optionDisplay'][6], inputDict['optionDisplay'][2], inputDict['optionDisplay'][4]))
@@ -340,7 +340,7 @@ class OwnerController:
                     pageName = 'Manage Hall Page'
                     userName = userObj.getFirstName()
                     pageNavDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back', 'A': 'Add New Hall'}
-                    headerDisplay = 'Input key to select corresponding option'
+                    headerDisplay = 'Select ID to view corresponding Hall Information and modify'
                     displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay}
                     self.displayPage(displayDict)
                     invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
@@ -377,8 +377,7 @@ class OwnerController:
                 pageName = 'Hall Detail Page'
                 userName = userObj.getFirstName()
                 pageNavDict = {'M': 'Modify Hall', 'D': 'Delete Hall','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-                headerDisplay = 'Input key to select corresponding option'
-                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state}
                 self.displayPage(displayDict)
                 #placeholder dictionary
                 bookHallPage = dict()
@@ -426,7 +425,7 @@ class OwnerController:
                 pageName = 'Requested Quotations Page'
                 userName = userObj.getFirstName()
                 pageNavDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
-                headerDisplay = 'Input key to select corresponding option'
+                headerDisplay = 'Select ID to Modify Quotation Requests'
                 displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
                 self.displayPage(displayDict)
                 #navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
@@ -452,8 +451,7 @@ class OwnerController:
                     pageNavDict = {'A': 'Accept', 'M':'Modify','R': 'Reject','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
                 else:
                     pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-                headerDisplay = 'Input key to select corresponding option'
-                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state}
                 self.displayPage(displayDict)
                 #displayPage('Quotation Details', userObj.getFirstName(), quotationDetails, navPageDict, state)
                 #placeholder dictionary
@@ -528,7 +526,7 @@ class OwnerController:
                 pageName = 'Requested Payments Page'
                 userName = userObj.getFirstName()
                 pageNavDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
-                headerDisplay = 'Input key to select corresponding option'
+                headerDisplay = 'Select ID to accept/reject Payment'
                 displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
                 self.displayPage(displayDict)
                 #navPageDict = {'O': 'Logout', 'E': 'Exit', 'B': 'Back'}
@@ -554,8 +552,7 @@ class OwnerController:
                     pageNavDict = {'A': 'Accept', 'R': 'Reject','B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
                 else:
                     pageNavDict = {'B': 'Go Back', 'O': 'Logout', 'E': 'Exit'}
-                headerDisplay = 'Input key to select corresponding option'
-                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'headerDisplay': headerDisplay, 'state': state}
+                displayDict = {'pageName': pageName, 'userName': userName, 'optionDisplay': optionDisplay, 'pageNavDict': pageNavDict, 'state': state}
                 self.displayPage(displayDict)
                 #displayPage('Quotation Details', userObj.getFirstName(), quotationDetails, navPageDict, state)
                 #placeholder dictionary
