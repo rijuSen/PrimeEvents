@@ -280,8 +280,6 @@ class Boundary:
                         exit()
                 else:
                     print('Invalid selection, Please input again')
-            print('State is {} and session ID is {} and user type is {}'.format(state, userObj.getRowId(),
-                                                                                userObj.getUserType()))
             # call respective controller to deal with further action
             while state == 2 and userObj.getUserType() == 'Customer':
                 customerController = CustomerController(userObj)
@@ -289,7 +287,11 @@ class Boundary:
             while state == 2 and userObj.getUserType() == 'Owner':
                 ownerController = OwnerController(userObj)
                 state = ownerController.getState()
-            print(state)
+            while state == 2 and userObj.getUserType() == 'Admin':
+                print("Admin functionalities can be accessed from the backend")
+                print("Redirecting to login page")
+                time.sleep(3)
+                state = 1
         else:
             exit()
 

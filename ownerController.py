@@ -455,8 +455,8 @@ class OwnerController:
                 self.displayPage(displayDict)
                 #displayPage('Quotation Details', userObj.getFirstName(), quotationDetails, navPageDict, state)
                 #placeholder dictionary
-                QuotationPage = dict()
-                invalidSelectionFlag, selection = self.selectOption(optionDisplay, pageNavDict)
+                placeHolder = dict()
+                invalidSelectionFlag, selection = self.selectOption(placeHolder, pageNavDict)
                 if not invalidSelectionFlag:
                     if selection in pageNavDict:
                         if selection == 'B':
@@ -501,6 +501,7 @@ class OwnerController:
                             state = self.navOptions(selection, state)
                 else:
                     print('Invalid selection, Please input again')
+                    state = 5
 
             while state == 7:
                 optionDisplay = Booking.listOwnerBookings(userObj.getRowId())
