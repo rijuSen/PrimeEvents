@@ -142,6 +142,7 @@ class OwnerController:
         """
         # prompt user to select option
         selection = input('Enter your selection: ')
+        selection = selection.upper()
         if isinstance(optionDisplay, dict) and selection in optionDisplay.keys():
             print('Your selection: {}'.format(optionDisplay.get(selection)))
             return False, selection
@@ -214,10 +215,24 @@ class OwnerController:
                 print('Maximum attemps reached, taking back to Manage Halls page')
                 time.sleep(2)
             else:
-                hallInfo['dayTariff'] = input('Enter Hall Per Day Tariff: ')
+                invalidPriceFlag = True
+                while invalidPriceFlag:
+                    dayTariff = input('Enter Hall Per Day Tariff: ')
+                    if dayTariff.isdigit():
+                        invalidPriceFlag = False
+                    else:
+                        print('{}{}'.format(dayTariff,' is not a valid Tariff. Please enter valid value'))
+                hallInfo['dayTariff'] = dayTariff
                 hallInfo['hallType'] = input('Enter Hall Type: ')
                 hallInfo['hallAddr'] = input('Enter Hall Addr: ')
-                hallInfo['hallCapacity'] = input('Enter Hall Capacity: ')
+                invalidCapacityFlag = True
+                while invalidCapacityFlag:
+                    hallCapacity = input('Enter Hall Capacity: ')
+                    if hallCapacity.isdigit():
+                        invalidCapacityFlag = False
+                    else:
+                        print('{}{}'.format(hallCapacity,' is not a valid Capacity. Please enter valid value'))
+                hallInfo['hallCapacity'] = hallCapacity
                 hallInfo['ownerId'] = userObj.getRowId()
         return hallExistFlag, hallInfo
 
@@ -264,10 +279,24 @@ class OwnerController:
                 print('Maximum attemps reached, taking back to Manage Halls page')
                 time.sleep(2)
             else:
-                hallInfo['dayTariff'] = input('Enter new Hall Per Day Tariff: ')
+                invalidPriceFlag = True
+                while invalidPriceFlag:
+                    dayTariff = input('Enter Hall Per Day Tariff: ')
+                    if dayTariff.isdigit():
+                        invalidPriceFlag = False
+                    else:
+                        print('{}{}'.format(dayTariff,' is not a valid Tariff. Please enter valid value'))
+                hallInfo['dayTariff'] = dayTariff
                 hallInfo['hallType'] = input('Enter new Hall Type: ')
                 hallInfo['hallAddr'] = input('Enter new Hall Addr: ')
-                hallInfo['hallCapacity'] = input('Enter new Hall Capacity: ')
+                invalidCapacityFlag = True
+                while invalidCapacityFlag:
+                    hallCapacity = input('Enter Hall Capacity: ')
+                    if hallCapacity.isdigit():
+                        invalidCapacityFlag = False
+                    else:
+                        print('{}{}'.format(hallCapacity,' is not a valid Capacity. Please enter valid value'))
+                hallInfo['hallCapacity'] = hallCapacity
                 hallInfo['ownerId'] = userObj.getRowId()
         return hallExistFlag, hallInfo
 

@@ -187,11 +187,13 @@ class Customer(User):
 class Admin(User):
     '''Admin class extending User'''
 
-    def __init__(self, firstName, lastName, email, password):
+    def __init__(self, userInfo):
         self.userType = "Admin"
-        super().__init__(firstName, lastName, email, password, self.userType)
+        # create a new entry in the DB
+        userInfo['userType'] = self.userType
+        super().__init__(userInfo)
 
-    def viewAllUsers():
+    def viewAllUsers(self):
         conn = sqlite3.connect(User.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid,firstName, lastName, email, userType, allowFlag FROM users")
@@ -200,7 +202,7 @@ class Admin(User):
             print(entry)
         conn.close()
 
-    def blockUser(rowid):
+    def blockUser(self, rowid):
         conn = sqlite3.connect(User.dbFileName)
         c = conn.cursor()
         try:
@@ -220,5 +222,25 @@ class Admin(User):
         finally:
             conn.close()
 
-    def viewAllBookings():
+    def unblockUser(self, rowid):
+        conn = sqlite3.connect(User.dbFileName)
+        c = conn.cursor()
+        try:
+            with conn:
+                # c.execute("SELECT last_insert_rowid()")
+                # print(c.fetchall())
+                c.execute("""UPDATE users SET allowFlag = :allowFlag WHERE rowid = :rowid""",
+                          {'allowFlag': 0, 'rowid': rowid})
+                # print(c.fetchone())
+                # if 'None' in str(c.fetchone()):
+                #   print('Id:',rowid,'is not present in the database')
+            # else:
+            #    c.execute("SELECT rowid,* FROM users WHERE rowid = :rowid",{'rowid': rowid,})
+            #   print(c.fetchone())
+        except sqlite3.Error as sqlite3Error:
+            print("SQLite3 Error -->", sqlite3Error)
+        finally:
+            conn.close()
+
+    def viewAllBookings(self):
         pass
