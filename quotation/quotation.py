@@ -5,7 +5,11 @@ import time
 
 
 class Quotation:
-    '''docstring'''
+    """
+    The Quotation object contains information about quotation
+    Args:
+    Attributes:
+    """
 
     # class variable to define the path to the DB file
     dbFileName = "databaseFiles/primeEventsDb.db"
@@ -29,6 +33,12 @@ class Quotation:
 #                   FOREIGN KEY(hallId) REFERENCES halls(rowid));
 
     def insertIntoUserDb(self):
+        """
+        This function adds a new quotation information into the Database
+            Args:
+            Raises:
+            Returns:
+        """
         try:
             conn = sqlite3.connect(Quotation.dbFileName)
             c = conn.cursor()
@@ -65,6 +75,19 @@ class Quotation:
 #                   FOREIGN KEY(hallId) REFERENCES halls(rowid));
 
     def getQuotationEntry(self):
+        """This function returns quotation details
+            Args:
+            Raises:
+            Returns:
+                - row -- dictionary
+                    reqDate
+                    hallId
+                    customerId
+                    status
+                    quotationAmount
+                    bookingStartDate
+                    bookingEndDate
+        """
         conn = sqlite3.connect(Quotation.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid, reqDate, bookingStartDate, bookingEndDate, hallId, customerId, status, quotationAmount FROM quotations WHERE rowid = :rowId",
@@ -74,7 +97,18 @@ class Quotation:
         return row
 
     def __init__(self, quoDict):
-        """docstring"""
+        """This is a constructor for quotation class
+            Args:
+                - quoDict -- dictionary
+                    reqDate
+                    hallId
+                    customerId
+                    quotationAmount
+                    bookingStartDate
+                    bookingEndDate
+            Raises:
+            Returns:
+        """
         if len(quoDict) == 6:
             # input('first if statement')
             # check if database file already exists
@@ -131,6 +165,19 @@ class Quotation:
 
     @classmethod
     def listQuotationRequests(cls, customerId):
+        """This function returns quotation details of all quotations of a customer
+            Args:
+            Raises:
+            Returns:
+                - list of quotationDetails -- dictionary
+                    reqDate
+                    hallId
+                    customerId
+                    status
+                    quotationAmount
+                    bookingStartDate
+                    bookingEndDate
+        """
         conn = sqlite3.connect(cls.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid, reqDate, bookingStartDate, bookingEndDate, hallId, customerId, status, quotationAmount FROM quotations WHERE customerId = :customerId",
@@ -141,6 +188,13 @@ class Quotation:
 
     @classmethod
     def changeStatus(self, rowId, status):
+        """This is a function to change quotation status
+            Args:
+                - rowId -- int - quotation ID whose status is to be changed
+                - status -- string - new status to be updated
+            Raises:
+            Returns:
+        """
         self.status = status
         """Only first name, last name and password can be modified"""
         conn = sqlite3.connect(Quotation.dbFileName)
@@ -157,6 +211,20 @@ class Quotation:
 
     @classmethod
     def listOwnerQuotationRequests(cls, ownerId):
+        """This function returns quotation details of all quotations of an owner
+            Args:
+                - ownerId -- int - owner ID of the user whose quotation info is to be retrieved
+            Raises:
+            Returns:
+                - list of quotationDetails -- dictionary
+                    reqDate
+                    hallId
+                    customerId
+                    status
+                    quotationAmount
+                    bookingStartDate
+                    bookingEndDate
+        """
         conn = sqlite3.connect(cls.dbFileName)
         c = conn.cursor()
         c.execute("SELECT rowid, bookingStartDate, bookingEndDate, hallId, customerId, status, quotationAmount FROM quotations WHERE hallId IN" +
@@ -167,6 +235,20 @@ class Quotation:
 
     @classmethod
     def viewQuotationDetails(cls,rowId):
+        """This function returns quotation details of a particular quotation
+            Args:
+                - rowId -- int - quotation ID whose details is to be retrieved
+            Raises:
+            Returns:
+                - quotationDetails -- dictionary
+                    reqDate
+                    hallId
+                    customerId
+                    status
+                    quotationAmount
+                    bookingStartDate
+                    bookingEndDate
+        """
         conn = sqlite3.connect(Quotation.dbFileName)
         c = conn.cursor()
         c.execute("""SELECT rowid, bookingStartDate, bookingEndDate, hallId, customerId, status, quotationAmount FROM quotations WHERE rowid = :rowId""",{'rowId' : rowId, })
@@ -178,7 +260,13 @@ class Quotation:
 
     @classmethod
     def changeAmount(self, rowId, amount):
-        """Only first name, last name and password can be modified"""
+        """This is a function to change quotation amount
+            Args:
+                - rowId -- int - quotation ID whose status is to be changed
+                - amount -- float - new amount to be updated
+            Raises:
+            Returns:
+        """
         conn = sqlite3.connect(Quotation.dbFileName)
         c = conn.cursor()
         try:
