@@ -1,6 +1,7 @@
 import os
 import time
 import datetime
+from datetime import date
 from hall.hall import Hall
 from quotation.quotation import Quotation
 from booking.booking import Booking
@@ -199,7 +200,11 @@ class CustomerController:
                 dateStr = input('Enter start date of booking (DD/MM/YYYY): ')
                 dateList = dateStr.split('/')
                 dateObj = datetime.date(int(dateList[2]), int(dateList[1]), int(dateList[0]))
-                return True, dateObj
+                if dateObj < date.today():
+                    errorInfo = 'Enter Valid date'
+                    return False, errorInfo
+                else:
+                    return True, dateObj
             except ValueError as errorInfo:
                 return False, errorInfo
             except TypeError as errorInfo:
