@@ -5,6 +5,7 @@ from pathlib import Path
 class Hall:
     """This class is the entity class of hall object
         Attributes:
+            hallId
             hallName
             ownerId
             dayTariff
@@ -54,7 +55,7 @@ class Hall:
             self.hallAddr = hallInfo['hallAddr']
             self.hallCapacity = hallInfo['hallCapacity']
             self.dbFilePath = Path(Hall.dbFileName)
-            self.insertIntoHallDb(self.hallName,self.ownerId,self.hallType,self.hallAddr,self.hallCapacity, self.dayTariff)
+            self.insertIntoHallDb()
         if len(hallInfo) == 1:
             self.rowId = hallInfo['hallId']
             row = Hall.viewHallDetails(self.rowId)
