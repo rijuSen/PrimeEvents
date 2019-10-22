@@ -391,7 +391,7 @@ class OwnerController:
                             hallExistFlag, hallModify = self.acceptModifyHallDetails(userObj, optionDisplay)
                             # create a user object
                             if not hallExistFlag:
-                                hallModify['Modify'] = True
+                                hallModify['hallId'] = optionDisplay[0]
                                 confirmation = input('Confirm Modification Request(Y/N): ')
                                 if confirmation.isalpha():
                                     if confirmation.lower() == 'y':
@@ -404,7 +404,7 @@ class OwnerController:
                             state = 3
                         elif selection == 'D':
                             hallDelete = dict()
-                            hallDelete['requested'] = True
+                            hallDelete['hallId'] = optionDisplay[0]
                             confirmation = input('Confirm Delete Request(Y/N): ')
                             if confirmation.isalpha():
                                 if confirmation.lower() == 'y':
